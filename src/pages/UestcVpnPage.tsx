@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { Button, Card, InputField } from '../components/Primitives'
 import type { AppOutletContext } from '../components/AppShell'
 import { decryptUrl, encryptUrl, isLikelyNavigableUrl, parseConversionResult } from '../lib/webvpn'
@@ -99,6 +99,25 @@ export function UestcVpnPage() {
 
   return (
     <section className="page page--tool">
+      <div className="tool-page-back">
+        <Link to="/" className="back-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          {copy.tool.backToHome}
+        </Link>
+      </div>
       <div className="home-hero tool-hero">
         <h1 className="home-hero__title">{copy.tool.title}</h1>
         <p className="home-hero__subtitle">{copy.tool.description}</p>
@@ -120,9 +139,6 @@ export function UestcVpnPage() {
             className="swap-btn"
             aria-label={copy.tool.swapAriaLabel}
             onClick={handleSwap}
-            style={{
-              transform: `rotate(${swapTick * 180}deg)`,
-            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -134,6 +150,7 @@ export function UestcVpnPage() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
               style={{
                 transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
                 transform: `rotate(${swapTick * 180}deg)`,
@@ -152,6 +169,22 @@ export function UestcVpnPage() {
             placeholder={copy.tool.outputPlaceholder}
             className={isError ? 'url-input--error' : undefined}
             readOnly
+            trailingButton={
+              output && !isError ? (
+                <button
+                  type="button"
+                  className={`url-field__copy-btn${copyState === 'copied' ? ' url-field__copy-btn--copied' : ''}`}
+                  aria-label={copy.tool.copy}
+                  onClick={() => void handleCopyAsync()}
+                >
+                  {copyState === 'copied' ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></svg>
+                  )}
+                </button>
+              ) : undefined
+            }
           />
         </div>
 
@@ -162,9 +195,15 @@ export function UestcVpnPage() {
             disabled={!output || isError}
             onClick={() => void handleCopyAsync()}
           >
+            {copyState === 'copied' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></svg>
+            )}
             {copyLabel}
           </Button>
           <Button type="button" disabled={!canJump} onClick={handleJump}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg>
             {copy.tool.jumpTo}
           </Button>
         </div>

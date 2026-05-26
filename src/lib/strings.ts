@@ -13,6 +13,7 @@ export type CopySet = {
     title: string
     description: string
     notice: string
+    backToHome: string
     swapAriaLabel: string
     inputLabelEncrypt: string
     inputLabelDecrypt: string
@@ -44,6 +45,7 @@ const COPY: Record<Locale, CopySet> = {
       title: 'UESTC WebVPN 转换',
       description: '普通 UESTC 链接与 WebVPN 代理链接互转。',
       notice: '本工具仅供电子科技大学在校师生使用，WebVPN 认证须由用户自行完成。',
+      backToHome: '工具箱',
       swapAriaLabel: '切换方向',
       inputLabelEncrypt: '原始链接',
       inputLabelDecrypt: 'WebVPN 链接',
@@ -74,6 +76,7 @@ const COPY: Record<Locale, CopySet> = {
       description: 'Convert between plain UESTC URLs and WebVPN-proxied URLs.',
       notice:
         'This tool is intended for UESTC students and staff only. WebVPN authentication is your own responsibility.',
+      backToHome: 'Toolbox',
       swapAriaLabel: 'Switch direction',
       inputLabelEncrypt: 'Plain URL',
       inputLabelDecrypt: 'WebVPN URL',

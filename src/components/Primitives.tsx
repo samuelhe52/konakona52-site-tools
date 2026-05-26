@@ -2,6 +2,7 @@ import type {
   ButtonHTMLAttributes,
   HTMLAttributes,
   InputHTMLAttributes,
+  ReactNode,
 } from 'react'
 
 function classNames(...values: Array<string | false | null | undefined>) {
@@ -33,17 +34,21 @@ export function Button({
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string
+  trailingButton?: ReactNode
 }
 
-export function InputField({ className, label, ...props }: InputFieldProps) {
+export function InputField({ className, label, trailingButton, ...props }: InputFieldProps) {
   return (
     <label className="url-field">
       <span className="url-field__label">{label}</span>
-      <input
-        aria-label={label}
-        className={classNames('url-input', className)}
-        {...props}
-      />
+      <div className="url-input-wrap">
+        <input
+          aria-label={label}
+          className={classNames('url-input', !!trailingButton && 'url-input--has-trailing', className)}
+          {...props}
+        />
+        {trailingButton}
+      </div>
     </label>
   )
 }

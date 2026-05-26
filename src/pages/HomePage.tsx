@@ -12,22 +12,40 @@ export function HomePage() {
       </div>
       <div className="tools-grid">
         <Link to="/uestc-vpn" className="tool-card">
-          <span className="tool-card__icon">
+          <div className="tool-card__header">
+            <span className="tool-card__icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
             <svg
+              className="tool-card__arrow"
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <path d="m9 18 6-6-6-6" />
             </svg>
-          </span>
+          </div>
           <h2 className="tool-card__title">{copy.home.toolTitle}</h2>
           <p className="tool-card__desc">{copy.home.toolDescription}</p>
         </Link>

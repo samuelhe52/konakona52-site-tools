@@ -215,10 +215,15 @@ a {
   color: var(--ink);
 }
 
+.brand:hover .brand__title {
+  color: var(--ink);
+}
+
 .brand__title {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  color: var(--muted);
   transition: color 160ms ease;
 }
 
@@ -366,6 +371,22 @@ a {
     background-color 200ms ease;
 }
 
+.tool-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.tool-card__arrow {
+  color: var(--soft);
+  flex-shrink: 0;
+  padding-right: 4px;
+  transition:
+    color 160ms ease,
+    transform 180ms ease;
+}
+
 .tool-card:hover,
 .tool-card:focus-visible {
   border-color: var(--border-strong);
@@ -384,7 +405,6 @@ a {
   background: var(--surface-muted);
   border: 1px solid var(--border);
   color: var(--accent);
-  margin-bottom: 14px;
   transition:
     background-color 160ms ease,
     border-color 160ms ease;
@@ -393,6 +413,11 @@ a {
 .tool-card:hover .tool-card__icon {
   background: var(--accent-subtle);
   border-color: transparent;
+}
+
+.tool-card:hover .tool-card__arrow {
+  color: var(--accent);
+  transform: translateX(2px);
 }
 
 .tool-card__title {
@@ -424,6 +449,27 @@ a {
   border-radius: var(--radius-md);
   background: var(--surface-muted);
   max-width: max-content;
+}
+
+/* ─── Back link ───────────────────────────────────────────── */
+
+.tool-page-back {
+  justify-self: center;
+  width: min(820px, 100%);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 160ms ease;
+}
+
+.back-link:hover {
+  color: var(--ink);
 }
 
 /* ─── Card primitive ──────────────────────────────────────── */
@@ -511,6 +557,11 @@ a {
   transition: color 160ms ease;
 }
 
+.url-input-wrap {
+  position: relative;
+  display: grid;
+}
+
 .url-input {
   width: 100%;
   height: 38px;
@@ -530,6 +581,10 @@ a {
     box-shadow 160ms ease;
 }
 
+.url-input--has-trailing {
+  padding-right: 38px;
+}
+
 .url-input:focus-visible {
   outline: none;
   border-color: var(--accent);
@@ -539,6 +594,50 @@ a {
 .url-input:read-only {
   background: var(--surface-muted);
   cursor: default;
+}
+
+.url-input-wrap:has(.url-field__copy-btn) .url-input:read-only {
+  cursor: pointer;
+}
+
+/* ─── Inline copy button ──────────────────────────────────── */
+
+.url-field__copy-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--soft);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.url-input-wrap:hover .url-field__copy-btn,
+.url-field__copy-btn:focus-visible,
+.url-field__copy-btn--copied {
+  opacity: 1;
+}
+
+.url-field__copy-btn:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+  outline: none;
+}
+
+.url-field__copy-btn--copied {
+  color: var(--success);
 }
 
 .url-input--error {
@@ -585,6 +684,7 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-height: 38px;
   padding: 0 16px;
   border-radius: var(--radius-md);
@@ -680,7 +780,6 @@ a {
   }
 
   .tools-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -691,7 +790,6 @@ a {
   .tool-card__icon {
     width: 32px;
     height: 32px;
-    margin-bottom: 12px;
   }
 
   .tool-card__title {
