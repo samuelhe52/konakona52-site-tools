@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import type { Locale } from './lib/locale'
-import { detectLocale } from './lib/locale'
+import { detectLocale, parseLocaleOverride } from './lib/locale'
 import { HomePage } from './pages/HomePage'
 import { UestcVpnPage } from './pages/UestcVpnPage'
 
@@ -21,8 +21,16 @@ function readNavigatorLanguages(): readonly string[] {
   return navigator.language ? [navigator.language] : ['en']
 }
 
+function readLocaleOverride(): Locale | undefined {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+
+  return parseLocaleOverride(new URLSearchParams(window.location.search).get('locale'))
+}
+
 function App({ locale }: AppProps) {
-  const activeLocale = locale ?? detectLocale(readNavigatorLanguages())
+  const activeLocale = locale ?? readLocaleOverride() ?? detectLocale(readNavigatorLanguages())
 
   return (
     <Routes>

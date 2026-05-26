@@ -34,7 +34,7 @@ const COPY: Record<Locale, CopySet> = {
   'zh-CN': {
     siteTitle: "Kona's Toolbox",
     home: {
-      heroTitle: '小工具',
+      heroTitle: '工具箱',
       heroSubtitle: '浏览器端运行的实用工具。数据不离开你的设备。',
       toolTitle: 'UESTC WebVPN 转换',
       toolDescription: '普通 UESTC 链接与 WebVPN 代理链接互转。',

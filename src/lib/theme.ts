@@ -30,6 +30,7 @@ export function applyTheme(theme: Theme): void {
       : false
   const isDark = theme === 'dark' || (theme === 'system' && prefersDark)
 
+  root.classList.toggle('light', theme === 'light')
   root.classList.toggle('dark', isDark)
   root.style.colorScheme = isDark ? 'dark' : 'light'
 }

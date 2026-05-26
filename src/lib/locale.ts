@@ -5,3 +5,20 @@ export function detectLocale(languages: readonly string[]): Locale {
     ? 'zh-CN'
     : 'en'
 }
+
+export function parseLocaleOverride(value: string | null | undefined): Locale | undefined {
+  if (!value) {
+    return undefined
+  }
+
+  const normalized = value.toLowerCase()
+  if (normalized.startsWith('zh')) {
+    return 'zh-CN'
+  }
+
+  if (normalized.startsWith('en')) {
+    return 'en'
+  }
+
+  return undefined
+}
