@@ -99,6 +99,10 @@ export function UestcVpnPage() {
 
   return (
     <section className="page page--tool">
+      <div className="home-hero tool-hero">
+        <h1 className="home-hero__title">{copy.tool.title}</h1>
+        <p className="home-hero__subtitle">{copy.tool.description}</p>
+      </div>
       <Card className="tool-surface">
         <div className="url-pair">
           <InputField

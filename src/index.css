@@ -222,25 +222,7 @@ a {
 .topbar__right {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.page-indicator {
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  opacity: 0;
-  max-width: 0;
-  transition:
-    opacity 200ms ease,
-    max-width 200ms ease;
-}
-
-.page-indicator--visible {
-  opacity: 1;
-  max-width: 200px;
+  gap: 12px;
 }
 
 /* ─── Theme toggle ────────────────────────────────────────── */
@@ -325,7 +307,7 @@ a {
 }
 
 .page--tool {
-  padding-top: 4px;
+  padding-top: 8px;
 }
 
 /* ─── Home: hero ──────────────────────────────────────────── */
@@ -348,6 +330,16 @@ a {
   color: var(--muted);
   line-height: 1.5;
   max-width: 480px;
+}
+
+.tool-hero {
+  justify-self: center;
+  width: min(820px, 100%);
+  margin-bottom: 4px;
+}
+
+.tool-hero .home-hero__subtitle {
+  max-width: 100%;
 }
 
 /* ─── Home: tools grid ────────────────────────────────────── */
@@ -452,12 +444,13 @@ a {
 /* ─── Tool notice ─────────────────────────────────────────── */
 
 .tool-notice {
-  margin: 16px 0 0;
-  font-size: 0.9rem;
+  justify-self: center;
+  width: min(820px, 100%);
+  margin: 10px 0 0;
+  font-size: 0.84rem;
   color: var(--soft);
-  max-width: 56rem;
   line-height: 1.5;
-  text-align: center;
+  text-align: left;
 }
 
 /* ─── URL pair (horizontal layout) ───────────────────────── */
@@ -684,15 +677,39 @@ a {
   }
 
   .tools-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .tool-card {
-    padding: 18px 20px;
+    padding: 16px 16px 18px;
+  }
+
+  .tool-card__icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 12px;
+  }
+
+  .tool-card__title {
+    font-size: 0.98rem;
+  }
+
+  .tool-card__desc {
+    font-size: 0.88rem;
   }
 
   .tool-surface {
     padding: 20px;
+  }
+
+  .tool-hero .home-hero__subtitle {
+    max-width: 100%;
+  }
+
+  .tool-notice {
+    margin-top: 8px;
+    font-size: 0.8rem;
   }
 
   .url-pair {
@@ -718,5 +735,17 @@ a {
 
   .home-hero__title {
     font-size: 1.2rem;
+  }
+
+  .tools-grid {
+    gap: 10px;
+  }
+
+  .tool-card {
+    padding: 14px 14px 16px;
+  }
+
+  .tool-card__desc {
+    font-size: 0.84rem;
   }
 }

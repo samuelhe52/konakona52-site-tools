@@ -2,7 +2,6 @@ import type { Locale } from './locale'
 
 export type CopySet = {
   siteTitle: string
-  navTool: string
   home: {
     heroTitle: string
     heroSubtitle: string
@@ -11,6 +10,8 @@ export type CopySet = {
     moreComing: string
   }
   tool: {
+    title: string
+    description: string
     notice: string
     swapAriaLabel: string
     inputLabelEncrypt: string
@@ -32,7 +33,6 @@ export type CopySet = {
 const COPY: Record<Locale, CopySet> = {
   'zh-CN': {
     siteTitle: "Kona's Toolbox",
-    navTool: 'UESTC WebVPN',
     home: {
       heroTitle: '小工具',
       heroSubtitle: '浏览器端运行的实用工具。数据不离开你的设备。',
@@ -41,6 +41,8 @@ const COPY: Record<Locale, CopySet> = {
       moreComing: '更多工具开发中。',
     },
     tool: {
+      title: 'UESTC WebVPN 转换',
+      description: '普通 UESTC 链接与 WebVPN 代理链接互转。',
       notice: '本工具仅供电子科技大学在校师生使用，WebVPN 认证须由用户自行完成。',
       swapAriaLabel: '切换方向',
       inputLabelEncrypt: '原始链接',
@@ -60,7 +62,6 @@ const COPY: Record<Locale, CopySet> = {
   },
   en: {
     siteTitle: "Kona's Toolbox",
-    navTool: 'UESTC WebVPN',
     home: {
       heroTitle: 'Toolbox',
       heroSubtitle: 'Small browser-side utilities. Your data never leaves the device.',
@@ -69,6 +70,8 @@ const COPY: Record<Locale, CopySet> = {
       moreComing: 'More tools coming.',
     },
     tool: {
+      title: 'UESTC WebVPN Redirect',
+      description: 'Convert between plain UESTC URLs and WebVPN-proxied URLs.',
       notice:
         'This tool is intended for UESTC students and staff only. WebVPN authentication is your own responsibility.',
       swapAriaLabel: 'Switch direction',

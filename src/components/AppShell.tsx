@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import type { Locale } from '../lib/locale'
 import { getCopy, type CopySet } from '../lib/strings'
 import { applyTheme, getStoredTheme, setStoredTheme, type Theme } from '../lib/theme'
@@ -138,8 +138,6 @@ function ThemeToggle() {
 
 export function AppShell({ locale }: AppShellProps) {
   const copy = getCopy(locale)
-  const location = useLocation()
-  const isToolPage = location.pathname === '/uestc-vpn'
   const year = new Date().getFullYear()
 
   return (
@@ -165,7 +163,6 @@ export function AppShell({ locale }: AppShellProps) {
           <span className="brand__title">{copy.siteTitle}</span>
         </Link>
         <div className="topbar__right">
-          <span className={`page-indicator${isToolPage ? ' page-indicator--visible' : ''}`}>{copy.navTool}</span>
           <ThemeToggle />
         </div>
       </header>
