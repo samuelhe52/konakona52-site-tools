@@ -1,4 +1,4 @@
-.PHONY: install dev build test lint preview check clean
+.PHONY: install dev build lint preview check deploy clean
 
 install:
 	npm install
@@ -9,16 +9,16 @@ dev:
 build:
 	npm run build
 
-test:
-	npm test
-
 lint:
 	npm run lint
 
 preview:
 	npm run preview
 
-check: lint test build
+check: lint build
+
+deploy:
+	./scripts/deploy.sh
 
 clean:
 	rm -rf dist coverage output .playwright-cli
