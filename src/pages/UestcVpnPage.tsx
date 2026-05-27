@@ -211,7 +211,7 @@ export function UestcVpnPage() {
         {isError && output ? (
           <p className="status-msg status-msg--error">{copy.tool.convertFailed}</p>
         ) : !canJump && output ? (
-          <p className="status-msg">{copy.tool.jumpUnavailable}</p>
+          <p className="status-msg status-msg--error">{copy.tool.jumpUnavailable}</p>
         ) : null}
       </Card>
       <p className="tool-notice">{copy.tool.notice}</p>
