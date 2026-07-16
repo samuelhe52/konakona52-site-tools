@@ -3,6 +3,7 @@ import { AppShell } from './components/AppShell'
 import type { Locale } from './lib/locale'
 import { detectLocale, parseLocaleOverride } from './lib/locale'
 import { HomePage } from './pages/HomePage'
+import { MarkdownViewerPage } from './pages/MarkdownViewerPage'
 import { UestcVpnPage } from './pages/UestcVpnPage'
 
 type AppProps = {
@@ -36,6 +37,7 @@ function App({ locale }: AppProps) {
     <Routes>
       <Route element={<AppShell locale={activeLocale} />}>
         <Route index element={<HomePage />} />
+        <Route path="markdown-viewer" element={<MarkdownViewerPage />} />
         <Route path="uestc-vpn" element={<UestcVpnPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

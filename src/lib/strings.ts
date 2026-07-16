@@ -7,6 +7,8 @@ export type CopySet = {
     heroSubtitle: string
     toolTitle: string
     toolDescription: string
+    markdownTitle: string
+    markdownDescription: string
     moreComing: string
   }
   tool: {
@@ -39,6 +41,8 @@ const COPY: Record<Locale, CopySet> = {
       heroSubtitle: '浏览器端运行的实用工具。数据不离开你的设备。',
       toolTitle: 'UESTC WebVPN 转换',
       toolDescription: '普通 UESTC 链接与 WebVPN 代理链接互转。',
+      markdownTitle: 'Markdown 在线预览',
+      markdownDescription: '粘贴或导入 Markdown 文件，即刻预览。',
       moreComing: '更多工具开发中。',
     },
     tool: {
@@ -69,6 +73,8 @@ const COPY: Record<Locale, CopySet> = {
       heroSubtitle: 'Small browser-side utilities. Your data never leaves the device.',
       toolTitle: 'UESTC WebVPN Redirect',
       toolDescription: 'Convert between plain UESTC URLs and WebVPN-proxied URLs.',
+      markdownTitle: 'Markdown Viewer',
+      markdownDescription: 'Paste or import a Markdown file and preview it instantly.',
       moreComing: 'More tools coming.',
     },
     tool: {
