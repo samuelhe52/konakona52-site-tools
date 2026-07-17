@@ -1,7 +1,15 @@
-import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
+import { isValidElement, useDeferredValue, useMemo, useRef, useState, type ChangeEvent, type ComponentPropsWithoutRef, type DragEvent, type ReactNode } from 'react'
+import Markdown, { type Components } from 'react-markdown'
 import { Link, useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
-import { renderMarkdown } from '../lib/markdown'
+import { MermaidDiagram } from '../components/MermaidDiagram'
+import { normalizeDisplayMath } from '../lib/markdown'
+import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize from 'rehype-sanitize'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import 'katex/dist/katex.min.css'
 
 const STARTER_MARKDOWN = `# A fresh Markdown preview
 
@@ -15,6 +23,24 @@ Paste Markdown here, or import a \`.md\` file. Your content stays in this browse
 - [ ] Your next great document
 
 > Keep the source on the left and a readable document on the right.
+
+<details>
+  <summary>Safe custom HTML is supported</summary>
+  <p>Useful semantic elements are rendered; scripts and unsafe attributes are removed.</p>
+</details>
+
+$$
+E = mc^2
+$$
+
+\\[
+\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}
+\\]
+
+\`\`\`mermaid
+flowchart LR
+  Write[Write Markdown] --> Preview[Preview it instantly]
+\`\`\`
 
 \`\`\`ts
 const message = 'Hello, Markdown!'
@@ -53,6 +79,25 @@ function ClearIcon() {
   )
 }
 
+type MarkdownPreProps = ComponentPropsWithoutRef<'pre'> & {
+  node?: unknown
+}
+
+function MarkdownPre({ children, node: _node, ...props }: MarkdownPreProps) {
+  if (isValidElement<{ className?: string; children?: ReactNode }>(children)) {
+    const language = children.props.className?.match(/language-(\S+)/)?.[1]
+    if (language === 'mermaid') {
+      return <MermaidDiagram chart={String(children.props.children).replace(/\n$/, '')} />
+    }
+  }
+
+  return <pre {...props}>{children}</pre>
+}
+
+const MARKDOWN_COMPONENTS: Components = {
+  pre: MarkdownPre,
+}
+
 export function MarkdownViewerPage() {
   const { locale } = useOutletContext<AppOutletContext>()
   const [source, setSource] = useState(STARTER_MARKDOWN)
@@ -60,6 +105,8 @@ export function MarkdownViewerPage() {
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isChinese = locale === 'zh-CN'
+  const deferredSource = useDeferredValue(source)
+  const normalizedMarkdown = useMemo(() => normalizeDisplayMath(deferredSource), [deferredSource])
 
   const labels = isChinese
     ? {
@@ -123,7 +170,6 @@ export function MarkdownViewerPage() {
   }
 
   const lineCount = source ? source.split('\n').length : 0
-  const preview = source.trim() ? renderMarkdown(source) : ''
   const lineLabel = isChinese ? `${lineCount} 行` : `${lineCount} ${lineCount === 1 ? 'line' : 'lines'}`
 
   return (
@@ -171,7 +217,19 @@ export function MarkdownViewerPage() {
 
         <article className="markdown-pane markdown-pane--preview">
           <div className="markdown-pane__bar markdown-pane__bar--preview"><span>{labels.preview}</span><span className="markdown-live"><i />{isChinese ? '实时更新' : 'Live'}</span></div>
-          <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: preview || `<p class="markdown-preview__empty">${labels.empty}</p>` }} />
+          <div className="markdown-preview">
+            {normalizedMarkdown.trim() ? (
+              <Markdown
+                components={MARKDOWN_COMPONENTS}
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeKatex]}
+              >
+                {normalizedMarkdown}
+              </Markdown>
+            ) : (
+              <p className="markdown-preview__empty">{labels.empty}</p>
+            )}
+          </div>
         </article>
       </div>
       <p className="markdown-privacy-note">{isChinese ? '无需上传，无需账户。文件仅在你的浏览器中读取。' : 'No upload, no account. Files are read only in your browser.'}</p>

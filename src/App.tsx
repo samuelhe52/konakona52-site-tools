@@ -1,10 +1,15 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import type { Locale } from './lib/locale'
 import { detectLocale, parseLocaleOverride } from './lib/locale'
 import { HomePage } from './pages/HomePage'
-import { MarkdownViewerPage } from './pages/MarkdownViewerPage'
 import { UestcVpnPage } from './pages/UestcVpnPage'
+
+const MarkdownViewerPage = lazy(async () => {
+  const module = await import('./pages/MarkdownViewerPage')
+  return { default: module.MarkdownViewerPage }
+})
 
 type AppProps = {
   locale?: Locale
@@ -37,7 +42,14 @@ function App({ locale }: AppProps) {
     <Routes>
       <Route element={<AppShell locale={activeLocale} />}>
         <Route index element={<HomePage />} />
-        <Route path="markdown-viewer" element={<MarkdownViewerPage />} />
+        <Route
+          path="markdown-viewer"
+          element={(
+            <Suspense fallback={null}>
+              <MarkdownViewerPage />
+            </Suspense>
+          )}
+        />
         <Route path="uestc-vpn" element={<UestcVpnPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

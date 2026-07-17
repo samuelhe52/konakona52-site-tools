@@ -929,6 +929,35 @@ a {
 .markdown-preview hr { border: 0; border-top: 1px solid var(--border); margin: 1.5em 0; }
 .markdown-preview__empty { color: var(--soft); }
 
+.markdown-preview details {
+  margin: 1.2em 0;
+  padding: 0.75em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.markdown-preview summary { cursor: pointer; font-weight: 700; }
+.markdown-preview details p { margin: 0.65em 0 0; }
+.markdown-preview .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.2em 0; }
+
+.markdown-mermaid {
+  display: grid;
+  place-items: center;
+  min-height: 100px;
+  margin: 1.2em 0;
+  padding: 16px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.markdown-mermaid svg { display: block; max-width: 100%; height: auto; }
+.markdown-mermaid--loading { color: var(--soft); font-size: 0.85rem; }
+.markdown-mermaid--error { display: block; color: var(--error); }
+.markdown-mermaid--error code { display: block; margin-top: 0.7em; white-space: pre-wrap; }
+
 .markdown-privacy-note { margin: -4px 0 0; color: var(--soft); font-size: 0.8rem; }
 
 :root.dark .button--success {
