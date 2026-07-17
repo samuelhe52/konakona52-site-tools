@@ -1,0 +1,31 @@
+[Unit]
+Description=Kona Toolbox ChatGPT share fetch proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/konakona52-chatgpt-share-proxy
+ExecStart=/usr/bin/python3 /opt/konakona52-chatgpt-share-proxy/chatgpt_share_proxy.py
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallFilter=@system-service
+MemoryMax=96M
+CPUQuota=25%
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=ALLOWED_ORIGINS=https://tools.konakona52.com
+
+[Install]
+WantedBy=multi-user.target

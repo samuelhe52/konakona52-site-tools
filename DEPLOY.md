@@ -1,12 +1,16 @@
 # Deployment
 
-This site deploys as static files behind the existing Nginx site on `serHK`.
+This site deploys behind the existing Nginx site on `serJP`. The web app stays static;
+the ChatGPT Share exporter uses one small, memory-only Python proxy solely to retrieve
+the public share HTML that browsers cannot retrieve cross-origin.
 
 ## Default target
 
-- SSH host: `serHK`
+- SSH host: `serJP`
 - Domain: `tools.konakona52.com`
-- Site root on server: `/var/www/tools.konakona52.com/dist`
+- Release root on server: `/var/www/tools.konakona52.com/releases`
+- Live site symlink: `/var/www/tools.konakona52.com/current`
+- Proxy service: `konakona-chatgpt-share-proxy.service` on `127.0.0.1:8765`
 
 ## Command
 
@@ -14,36 +18,48 @@ This site deploys as static files behind the existing Nginx site on `serHK`.
 make deploy
 ```
 
-The deploy script will:
+The deploy command will:
 
 1. Run `npm run lint` and `npm run build`.
-2. Ensure the deployed content directory exists on the server.
-3. Sync `dist/` to the server with `rsync --delete`.
-4. Verify the public HTTPS endpoint.
+2. Sync `dist/` to a timestamped release directory and atomically switch `current`.
+3. Keep the five most recent static releases for rollback.
+4. Install the proxy service and Nginx configuration, then validate both Nginx and its public health endpoint.
+5. Verify the public HTTPS endpoint.
+
+Use `make deploy-static` or `make deploy-proxy` for the respective portions.
+
+## Proxy boundary and privacy
+
+`POST /api/chatgpt-share/fetch` accepts only a ChatGPT share UUID; it constructs the fixed
+`https://chatgpt.com/share/<UUID>` upstream itself. It rejects arbitrary URLs, redirects,
+oversized/non-HTML responses, invalid origins, and excess requests. Nginx and the service
+both rate-limit it. It accepts no ChatGPT cookies or credentials.
+
+The proxy sets `Cache-Control: no-store`, writes no request/response-body logs, uses no
+database or disk cache, and holds the fetched HTML only long enough to return it to the
+browser. Parsing and archive creation occur in the browser. An HTML import path remains
+available for people who prefer not to use the proxy.
 
 ## One-off server setup
 
-The Nginx site and HTTPS certificate are intentionally not managed from this repo.
+The first `make deploy` installs the required service and Nginx files. It requires the
+`serJP` SSH target to have passwordless sudo for the deployment user.
 
-They were bootstrapped directly on `serHK` with:
-
-```bash
-sudo install -d -m 755 -o samuel -g www-data /var/www/tools.konakona52.com/dist
-sudoedit /etc/nginx/sites-available/tools.konakona52.com.conf
-sudo ln -s /etc/nginx/sites-available/tools.konakona52.com.conf /etc/nginx/sites-enabled/tools.konakona52.com.conf
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d tools.konakona52.com --redirect
-```
+Before publishing the Share Export route, probe a public share from the deployment host. If
+ChatGPT blocks that host, leave the route unpublished: the HTML-import path still works, but a
+proxy error is not an acceptable substitute for the normal URL workflow.
 
 ## Overrides
 
 These environment variables can be set when you need a different target:
 
 ```bash
-SSH_HOST=serHK DOMAIN=tools.konakona52.com make deploy
+SSH_HOST=serJP DOMAIN=tools.konakona52.com make deploy
 ```
 
 Optional:
 
 - `REMOTE_SITE_ROOT`
-- `REMOTE_DIST_DIR`
+- `REMOTE_RELEASE_DIR`
+- `RELEASE_ID`
+- `REMOTE_PROXY_DIR`

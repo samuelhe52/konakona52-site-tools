@@ -4,6 +4,7 @@ import { AppShell } from './components/AppShell'
 import type { Locale } from './lib/locale'
 import { detectLocale, parseLocaleOverride } from './lib/locale'
 import { HomePage } from './pages/HomePage'
+import { ChatGptSharePage } from './pages/ChatGptSharePage'
 import { UestcVpnPage } from './pages/UestcVpnPage'
 
 const MarkdownViewerPage = lazy(async () => {
@@ -42,6 +43,7 @@ function App({ locale }: AppProps) {
     <Routes>
       <Route element={<AppShell locale={activeLocale} />}>
         <Route index element={<HomePage />} />
+        <Route path="chatgpt-share" element={<ChatGptSharePage />} />
         <Route
           path="markdown-viewer"
           element={(

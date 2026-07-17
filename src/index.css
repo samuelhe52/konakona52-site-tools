@@ -763,6 +763,145 @@ a {
   color: var(--success);
 }
 
+/* ─── ChatGPT share export ───────────────────────────────── */
+
+.share-surface,
+.share-result {
+  gap: 20px;
+}
+
+.share-privacy {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--muted);
+}
+
+.share-privacy svg {
+  margin-top: 3px;
+  color: var(--accent);
+}
+
+.share-privacy p,
+.share-result__summary h2,
+.share-result__summary p,
+.share-preview__title {
+  margin: 0;
+}
+
+.share-privacy p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.share-fetch-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.share-import {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--soft);
+  font-size: 0.84rem;
+}
+
+.share-result {
+  gap: 14px;
+}
+
+.share-result__summary h2 {
+  font-size: 1.12rem;
+  line-height: 1.3;
+}
+
+.share-result__summary p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.share-actions {
+  justify-content: flex-start;
+  padding-top: 2px;
+}
+
+.share-file-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.share-file-status__label {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.share-file-status__item + .share-file-status__item::before {
+  content: '·';
+  margin-right: 12px;
+  color: var(--soft);
+}
+
+.share-file-status__item--unavailable {
+  color: #b45309;
+}
+
+.share-file-status__item--session {
+  color: var(--accent);
+}
+
+.share-preview-surface {
+  gap: 14px;
+}
+
+.share-preview__title {
+  font-size: 1.12rem;
+  line-height: 1.3;
+}
+
+.share-preview {
+  max-height: 42rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 620px) {
+  .share-fetch-row {
+    grid-template-columns: 1fr;
+  }
+
+  .share-fetch-row .button {
+    width: 100%;
+  }
+}
+
 /* ─── Markdown viewer ────────────────────────────────────── */
 
 .page--markdown {
