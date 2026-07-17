@@ -18,6 +18,11 @@
   --error: #b91c1c;
   --error-bg: #fef2f2;
   --error-border: #fecaca;
+  --syntax-comment: #6b7280;
+  --syntax-keyword: #7c3aed;
+  --syntax-string: #167348;
+  --syntax-number: #a16207;
+  --syntax-function: #1d4ed8;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -57,6 +62,11 @@
   --error: #ef4444;
   --error-bg: rgba(239, 68, 68, 0.08);
   --error-border: rgba(239, 68, 68, 0.2);
+  --syntax-comment: #8a929e;
+  --syntax-keyword: #c084fc;
+  --syntax-string: #6ee7a0;
+  --syntax-number: #fbbf24;
+  --syntax-function: #7fb0ff;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -81,6 +91,11 @@
     --error: #ef4444;
     --error-bg: rgba(239, 68, 68, 0.08);
     --error-border: rgba(239, 68, 68, 0.2);
+    --syntax-comment: #8a929e;
+    --syntax-keyword: #c084fc;
+    --syntax-string: #6ee7a0;
+    --syntax-number: #fbbf24;
+    --syntax-function: #7fb0ff;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -925,6 +940,12 @@ a {
 .markdown-preview code { padding: 0.15em 0.35em; border-radius: 3px; background: var(--surface-muted); font-family: var(--font-mono); font-size: 0.85em; }
 .markdown-preview pre { margin: 1.2em 0; padding: 14px 16px; overflow: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-muted); }
 .markdown-preview pre code { padding: 0; background: transparent; font-size: 0.82rem; }
+.markdown-preview .hljs { color: var(--ink); }
+.markdown-preview .hljs-comment, .markdown-preview .hljs-quote { color: var(--syntax-comment); font-style: italic; }
+.markdown-preview .hljs-keyword, .markdown-preview .hljs-selector-tag, .markdown-preview .hljs-literal, .markdown-preview .hljs-meta { color: var(--syntax-keyword); }
+.markdown-preview .hljs-string, .markdown-preview .hljs-regexp, .markdown-preview .hljs-attribute, .markdown-preview .hljs-template-variable { color: var(--syntax-string); }
+.markdown-preview .hljs-number, .markdown-preview .hljs-symbol, .markdown-preview .hljs-bullet { color: var(--syntax-number); }
+.markdown-preview .hljs-title, .markdown-preview .hljs-function, .markdown-preview .hljs-built_in, .markdown-preview .hljs-type { color: var(--syntax-function); }
 .markdown-preview img { max-width: 100%; border-radius: var(--radius-sm); }
 .markdown-preview hr { border: 0; border-top: 1px solid var(--border); margin: 1.5em 0; }
 .markdown-preview__empty { color: var(--soft); }

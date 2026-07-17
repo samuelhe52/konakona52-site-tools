@@ -1,15 +1,7 @@
-import { isValidElement, useDeferredValue, useMemo, useRef, useState, type ChangeEvent, type ComponentPropsWithoutRef, type DragEvent, type ReactNode } from 'react'
-import Markdown, { type Components } from 'react-markdown'
+import { useDeferredValue, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
-import { MermaidDiagram } from '../components/MermaidDiagram'
-import { normalizeDisplayMath } from '../lib/markdown'
-import rehypeKatex from 'rehype-katex'
-import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
-import 'katex/dist/katex.min.css'
+import { MarkdownPreview } from '../components/MarkdownPreview'
 
 const STARTER_MARKDOWN = `# A fresh Markdown preview
 
@@ -79,25 +71,6 @@ function ClearIcon() {
   )
 }
 
-type MarkdownPreProps = ComponentPropsWithoutRef<'pre'> & {
-  node?: unknown
-}
-
-function MarkdownPre({ children, node: _node, ...props }: MarkdownPreProps) {
-  if (isValidElement<{ className?: string; children?: ReactNode }>(children)) {
-    const language = children.props.className?.match(/language-(\S+)/)?.[1]
-    if (language === 'mermaid') {
-      return <MermaidDiagram chart={String(children.props.children).replace(/\n$/, '')} />
-    }
-  }
-
-  return <pre {...props}>{children}</pre>
-}
-
-const MARKDOWN_COMPONENTS: Components = {
-  pre: MarkdownPre,
-}
-
 export function MarkdownViewerPage() {
   const { locale } = useOutletContext<AppOutletContext>()
   const [source, setSource] = useState(STARTER_MARKDOWN)
@@ -106,7 +79,6 @@ export function MarkdownViewerPage() {
   const inputRef = useRef<HTMLInputElement>(null)
   const isChinese = locale === 'zh-CN'
   const deferredSource = useDeferredValue(source)
-  const normalizedMarkdown = useMemo(() => normalizeDisplayMath(deferredSource), [deferredSource])
 
   const labels = isChinese
     ? {
@@ -217,19 +189,13 @@ export function MarkdownViewerPage() {
 
         <article className="markdown-pane markdown-pane--preview">
           <div className="markdown-pane__bar markdown-pane__bar--preview"><span>{labels.preview}</span><span className="markdown-live"><i />{isChinese ? '实时更新' : 'Live'}</span></div>
-          <div className="markdown-preview">
-            {normalizedMarkdown.trim() ? (
-              <Markdown
-                components={MARKDOWN_COMPONENTS}
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeKatex]}
-              >
-                {normalizedMarkdown}
-              </Markdown>
-            ) : (
+          {deferredSource.trim() ? (
+            <MarkdownPreview>{deferredSource}</MarkdownPreview>
+          ) : (
+            <div className="markdown-preview">
               <p className="markdown-preview__empty">{labels.empty}</p>
-            )}
-          </div>
+            </div>
+          )}
         </article>
       </div>
       <p className="markdown-privacy-note">{isChinese ? '无需上传，无需账户。文件仅在你的浏览器中读取。' : 'No upload, no account. Files are read only in your browser.'}</p>
