@@ -200,7 +200,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 0 0 40px;
+  padding: 0 0 32px;
 }
 
 .brand {
@@ -327,7 +327,7 @@ a {
 }
 
 .page--home {
-  padding-top: 16px;
+  padding-top: 0;
 }
 
 .page--tool {
@@ -454,17 +454,13 @@ a {
 /* ─── Empty state ─────────────────────────────────────────── */
 
 .empty-state {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
+  min-height: 36px;
+  padding: 6px 16px;
   color: var(--soft);
-  font-size: 0.9rem;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-muted);
-  max-width: max-content;
+  font-size: 0.84rem;
 }
 
 /* ─── Back link ───────────────────────────────────────────── */
@@ -1131,21 +1127,12 @@ a {
     font-size: 16px;
   }
 
-  .empty-state {
-    display: flex;
-    width: 100%;
-    max-width: none;
-    padding: 48px 24px;
-    border-radius: var(--radius-lg);
-    font-size: 0.94rem;
-  }
-
   .site-frame {
     padding: 20px 16px 16px;
   }
 
   .topbar {
-    padding-bottom: 28px;
+    padding-bottom: 24px;
   }
 
   .home-hero__title {
