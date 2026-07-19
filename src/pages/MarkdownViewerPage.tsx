@@ -5,7 +5,7 @@ import { MarkdownPreview } from '../components/MarkdownPreview'
 
 const STARTER_MARKDOWN = `# A fresh Markdown preview
 
-Paste Markdown here, or import a \`.md\` file. Your content stays in this browser tab.
+Paste Markdown here, or import a \`.md\` file.
 
 ## What it supports
 
@@ -83,7 +83,7 @@ export function MarkdownViewerPage() {
   const labels = isChinese
     ? {
         title: 'Markdown 在线预览',
-        description: '粘贴文本或导入 .md 文件，即刻获得可读的文档预览。内容始终保留在此浏览器标签页中。',
+        description: '粘贴文本或导入 .md 文件，即刻获得可读的文档预览。',
         import: '导入 .md',
         paste: '粘贴 Markdown',
         clear: '清空',
@@ -95,7 +95,7 @@ export function MarkdownViewerPage() {
       }
     : {
         title: 'Preview Markdown, instantly',
-        description: 'Paste text or import a .md file for a clean document preview. Your content stays in this browser tab.',
+        description: 'Paste text or import a .md file for a clean document preview.',
         import: 'Import .md',
         paste: 'Paste Markdown',
         clear: 'Clear',
@@ -198,7 +198,6 @@ export function MarkdownViewerPage() {
           )}
         </article>
       </div>
-      <p className="markdown-privacy-note">{isChinese ? '无需上传，无需账户。文件仅在你的浏览器中读取。' : 'No upload, no account. Files are read only in your browser.'}</p>
     </section>
   )
 }

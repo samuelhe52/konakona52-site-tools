@@ -3,8 +3,6 @@ import type { Locale } from './locale'
 export type CopySet = {
   siteTitle: string
   home: {
-    heroTitle: string
-    heroSubtitle: string
     toolTitle: string
     toolDescription: string
     chatgptShareTitle: string
@@ -66,14 +64,12 @@ const COPY: Record<Locale, CopySet> = {
   'zh-CN': {
     siteTitle: "Kona's Toolbox",
     home: {
-      heroTitle: '工具箱',
-      heroSubtitle: '以浏览器端为主的实用工具。',
       toolTitle: 'UESTC WebVPN 转换',
       toolDescription: '普通 UESTC 链接与 WebVPN 代理链接互转。',
       chatgptShareTitle: 'ChatGPT 分享导出',
       chatgptShareDescription: '将公开分享对话导出为 Markdown。',
       markdownTitle: 'Markdown 在线预览',
-      markdownDescription: '粘贴或导入 Markdown 文件，即刻预览。',
+      markdownDescription: '粘贴或导入 Markdown 文件并预览。',
       moreComing: '更多工具开发中。',
     },
     tool: {
@@ -121,20 +117,18 @@ const COPY: Record<Locale, CopySet> = {
       unavailableUploadsShort: '{count} 个原始上传文件不可用',
       sessionArtifactsShort: '{count} 个生成文件仅能在 ChatGPT 下载',
       previewTitle: '预览',
-      notice: '仅处理公开的 chatgpt.com/share 链接。请勿使用此工具处理不应公开的对话。',
+      notice: '仅处理公开的 chatgpt.com/share 链接。',
     },
   },
   en: {
     siteTitle: "Kona's Toolbox",
     home: {
-      heroTitle: 'Toolbox',
-      heroSubtitle: 'Small browser-first utilities.',
       toolTitle: 'UESTC WebVPN Redirect',
       toolDescription: 'Convert between plain UESTC URLs and WebVPN-proxied URLs.',
       chatgptShareTitle: 'ChatGPT Share Export',
       chatgptShareDescription: 'Export a public shared chat to Markdown.',
       markdownTitle: 'Markdown Viewer',
-      markdownDescription: 'Paste or import a Markdown file and preview it instantly.',
+      markdownDescription: 'Paste or import a Markdown file and preview it.',
       moreComing: 'More tools coming.',
     },
     tool: {
@@ -183,7 +177,7 @@ const COPY: Record<Locale, CopySet> = {
       unavailableUploadsShort: '{count} original upload(s) unavailable',
       sessionArtifactsShort: '{count} generated file(s) download only on ChatGPT',
       previewTitle: 'Preview',
-      notice: 'Only public chatgpt.com/share links are accepted. Do not use this tool for conversations that should remain private.',
+      notice: 'Only public chatgpt.com/share links are accepted.',
     },
   },
 }

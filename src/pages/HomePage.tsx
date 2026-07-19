@@ -6,10 +6,6 @@ export function HomePage() {
 
   return (
     <section className="page page--home">
-      <div className="home-hero">
-        <h1 className="home-hero__title">{copy.home.heroTitle}</h1>
-        <p className="home-hero__subtitle">{copy.home.heroSubtitle}</p>
-      </div>
       <div className="tools-grid">
         <Link to="/chatgpt-share" className="tool-card">
           <div className="tool-card__header">
