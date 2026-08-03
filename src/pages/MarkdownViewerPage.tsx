@@ -3,6 +3,9 @@ import { Link, useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
 
+type WorkspaceLayout = 'split' | 'full'
+type FullView = 'source' | 'rendered'
+
 const STARTER_MARKDOWN = `# A fresh Markdown preview
 
 Paste Markdown here, or import a \`.md\` file.
@@ -76,6 +79,8 @@ export function MarkdownViewerPage() {
   const [source, setSource] = useState(STARTER_MARKDOWN)
   const [fileName, setFileName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [workspaceLayout, setWorkspaceLayout] = useState<WorkspaceLayout>('split')
+  const [fullView, setFullView] = useState<FullView>('rendered')
   const inputRef = useRef<HTMLInputElement>(null)
   const isChinese = locale === 'zh-CN'
   const deferredSource = useDeferredValue(source)
@@ -85,25 +90,43 @@ export function MarkdownViewerPage() {
         title: 'Markdown 在线预览',
         description: '粘贴文本或导入 .md 文件，即刻获得可读的文档预览。',
         import: '导入 .md',
+        importCompact: '导入',
         paste: '粘贴 Markdown',
+        pasteCompact: '粘贴',
         clear: '清空',
         editor: 'Markdown 源码',
         preview: '预览',
         drop: '把 .md 文件拖到这里',
         empty: '从左侧开始输入，预览会实时更新。',
         back: '工具箱',
+        layout: '布局',
+        sideBySide: '并排',
+        sideBySideCompact: '并排',
+        full: '全宽',
+        fullView: '全宽视图',
+        source: '源码',
+        rendered: '渲染',
       }
     : {
         title: 'Preview Markdown, instantly',
         description: 'Paste text or import a .md file for a clean document preview.',
         import: 'Import .md',
+        importCompact: 'Import',
         paste: 'Paste Markdown',
+        pasteCompact: 'Paste',
         clear: 'Clear',
         editor: 'Markdown source',
         preview: 'Preview',
         drop: 'Drop a .md file here',
         empty: 'Start writing on the left. Your preview updates as you type.',
         back: 'Toolbox',
+        layout: 'Layout',
+        sideBySide: 'Side by side',
+        sideBySideCompact: 'Split',
+        full: 'Full',
+        fullView: 'Full view',
+        source: 'Source',
+        rendered: 'Rendered',
       }
 
   function loadFile(file: File | undefined) {
@@ -143,6 +166,8 @@ export function MarkdownViewerPage() {
 
   const lineCount = source ? source.split('\n').length : 0
   const lineLabel = isChinese ? `${lineCount} 行` : `${lineCount} ${lineCount === 1 ? 'line' : 'lines'}`
+  const showEditor = workspaceLayout === 'split' || fullView === 'source'
+  const showPreview = workspaceLayout === 'split' || fullView === 'rendered'
 
   return (
     <section className="page page--markdown">
@@ -163,40 +188,75 @@ export function MarkdownViewerPage() {
         onDrop={handleDrop}
       >
         {isDragging && <div className="markdown-drop-zone">{labels.drop}</div>}
-        <div className="markdown-pane markdown-pane--editor">
-          <div className="markdown-pane__bar">
-            <span>{labels.editor}</span>
-            <div className="markdown-pane__actions">
-              <button className="markdown-icon-button" type="button" onClick={() => { setSource(''); setFileName(null) }} aria-label={labels.clear} title={labels.clear}><ClearIcon /></button>
-              <input ref={inputRef} className="markdown-file-input" type="file" accept=".md,text/markdown" onChange={handleUpload} />
-              <button className="markdown-action markdown-action--secondary" type="button" onClick={() => inputRef.current?.click()}><UploadIcon />{labels.import}</button>
-              <button className="markdown-action markdown-action--primary" type="button" onClick={pasteFromClipboard}><ClipboardIcon />{labels.paste}</button>
+        <div className="markdown-workspace__toolbar">
+          <div className="markdown-workspace__view-controls">
+            <div className="markdown-view-switch" role="group" aria-label={labels.layout}>
+              <button type="button" aria-label={labels.sideBySide} aria-pressed={workspaceLayout === 'split'} onClick={() => setWorkspaceLayout('split')}>
+                <span className="markdown-control-label markdown-control-label--full">{labels.sideBySide}</span>
+                <span className="markdown-control-label markdown-control-label--compact">{labels.sideBySideCompact}</span>
+              </button>
+              <button type="button" aria-pressed={workspaceLayout === 'full'} onClick={() => setWorkspaceLayout('full')}>{labels.full}</button>
             </div>
+            {workspaceLayout === 'full' ? (
+              <>
+                <span className="markdown-toolbar-divider" aria-hidden="true" />
+                <div className="markdown-view-switch" role="group" aria-label={labels.fullView}>
+                  <button type="button" aria-pressed={fullView === 'source'} onClick={() => setFullView('source')}>{labels.source}</button>
+                  <button type="button" aria-pressed={fullView === 'rendered'} onClick={() => setFullView('rendered')}>{labels.rendered}</button>
+                </div>
+              </>
+            ) : null}
           </div>
-          <textarea
-            value={source}
-            onChange={(event) => { setSource(event.target.value); setFileName(null) }}
-            className="markdown-editor"
-            aria-label={labels.editor}
-            spellCheck={false}
-            placeholder="# Markdown"
-          />
-          <div className="markdown-pane__status">
-            <span>{fileName ?? lineLabel}</span>
-            <span>{source.length} {isChinese ? '字符' : 'characters'}</span>
+          <div className="markdown-workspace__actions">
+            <input ref={inputRef} className="markdown-file-input" type="file" accept=".md,text/markdown" onChange={handleUpload} />
+            <button className="markdown-action markdown-action--secondary" type="button" aria-label={labels.import} onClick={() => inputRef.current?.click()}>
+              <UploadIcon />
+              <span className="markdown-control-label markdown-control-label--full">{labels.import}</span>
+              <span className="markdown-control-label markdown-control-label--compact">{labels.importCompact}</span>
+            </button>
+            <button className="markdown-action markdown-action--primary" type="button" aria-label={labels.paste} onClick={pasteFromClipboard}>
+              <ClipboardIcon />
+              <span className="markdown-control-label markdown-control-label--full">{labels.paste}</span>
+              <span className="markdown-control-label markdown-control-label--compact">{labels.pasteCompact}</span>
+            </button>
+            <span className="markdown-toolbar-divider" aria-hidden="true" />
+            <button className="markdown-action markdown-action--secondary" type="button" onClick={() => { setSource(''); setFileName(null) }}><ClearIcon />{labels.clear}</button>
           </div>
         </div>
-
-        <article className="markdown-pane markdown-pane--preview">
-          <div className="markdown-pane__bar markdown-pane__bar--preview"><span>{labels.preview}</span><span className="markdown-live"><i />{isChinese ? '实时更新' : 'Live'}</span></div>
-          {deferredSource.trim() ? (
-            <MarkdownPreview>{deferredSource}</MarkdownPreview>
-          ) : (
-            <div className="markdown-preview">
-              <p className="markdown-preview__empty">{labels.empty}</p>
+        <div className={`markdown-workspace__body ${workspaceLayout === 'full' ? 'markdown-workspace__body--full' : ''}`}>
+          {showEditor ? (
+            <div className="markdown-pane markdown-pane--editor">
+              <div className="markdown-pane__bar">
+                <span>{labels.editor}</span>
+              </div>
+              <textarea
+                value={source}
+                onChange={(event) => { setSource(event.target.value); setFileName(null) }}
+                className="markdown-editor"
+                aria-label={labels.editor}
+                spellCheck={false}
+                placeholder="# Markdown"
+              />
+              <div className="markdown-pane__status">
+                <span>{fileName ?? lineLabel}</span>
+                <span>{source.length} {isChinese ? '字符' : 'characters'}</span>
+              </div>
             </div>
-          )}
-        </article>
+          ) : null}
+
+          {showPreview ? (
+            <article className="markdown-pane markdown-pane--preview">
+              <div className="markdown-pane__bar markdown-pane__bar--preview"><span>{labels.preview}</span><span className="markdown-live"><i />{isChinese ? '实时更新' : 'Live'}</span></div>
+              {deferredSource.trim() ? (
+                <MarkdownPreview>{deferredSource}</MarkdownPreview>
+              ) : (
+                <div className="markdown-preview">
+                  <p className="markdown-preview__empty">{labels.empty}</p>
+                </div>
+              )}
+            </article>
+          ) : null}
+        </div>
       </div>
     </section>
   )

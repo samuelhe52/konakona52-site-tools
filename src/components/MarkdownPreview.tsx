@@ -14,6 +14,10 @@ type MarkdownPreProps = ComponentPropsWithoutRef<'pre'> & {
   node?: unknown
 }
 
+type MarkdownTableProps = ComponentPropsWithoutRef<'table'> & {
+  node?: unknown
+}
+
 function MarkdownPre({ children, node: _node, ...props }: MarkdownPreProps) {
   if (isValidElement<{ className?: string; children?: ReactNode }>(children)) {
     const language = children.props.className?.match(/language-(\S+)/)?.[1]
@@ -25,8 +29,17 @@ function MarkdownPre({ children, node: _node, ...props }: MarkdownPreProps) {
   return <pre {...props}>{children}</pre>
 }
 
+function MarkdownTable({ node: _node, ...props }: MarkdownTableProps) {
+  return (
+    <div className="markdown-table-wrap">
+      <table {...props} />
+    </div>
+  )
+}
+
 const MARKDOWN_COMPONENTS: Components = {
   pre: MarkdownPre,
+  table: MarkdownTable,
 }
 
 type MarkdownPreviewProps = {
