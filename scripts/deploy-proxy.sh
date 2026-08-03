@@ -31,6 +31,7 @@ main() {
     sudo systemctl reload nginx
   "
 
+  sleep 3
   curl --silent --show-error --fail "https://${DOMAIN}/api/chatgpt-share/health" >/dev/null
   curl --silent --show-error --fail -I "https://${DOMAIN}" >/dev/null
   printf 'ChatGPT share proxy deployed: https://%s/api/chatgpt-share/health\n' "${DOMAIN}"
