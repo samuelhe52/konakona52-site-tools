@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import 'katex/dist/katex.min.css'
 import { MermaidDiagram } from './MermaidDiagram'
-import { normalizeDisplayMath } from '../lib/markdown'
+import { normalizeMathDelimiters } from '../lib/markdown'
 
 type MarkdownPreProps = ComponentPropsWithoutRef<'pre'> & {
   node?: unknown
@@ -51,7 +51,7 @@ export function MarkdownPreview({ children, className }: MarkdownPreviewProps) {
           }],
         ]}
       >
-        {normalizeDisplayMath(children)}
+        {normalizeMathDelimiters(children)}
       </Markdown>
     </div>
   )
