@@ -25,7 +25,7 @@ RATE_LIMIT = 6
 MAX_CONCURRENT_FETCHES = 8
 ALLOWED_ORIGINS = frozenset(
     origin.strip()
-    for origin in os.environ.get("ALLOWED_ORIGINS", "https://tools.konakona52.com").split(",")
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
     if origin.strip()
 )
 
