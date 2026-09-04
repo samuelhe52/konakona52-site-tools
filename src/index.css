@@ -384,7 +384,6 @@ a {
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
-    transform 180ms ease,
     background-color 200ms ease;
 }
 
@@ -408,7 +407,6 @@ a {
 .tool-card:focus-visible {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
   outline: none;
 }
 
