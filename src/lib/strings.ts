@@ -15,7 +15,6 @@ export type CopySet = {
     title: string
     description: string
     notice: string
-    backToHome: string
     swapAriaLabel: string
     inputLabelEncrypt: string
     inputLabelDecrypt: string
@@ -34,7 +33,6 @@ export type CopySet = {
   share: {
     title: string
     description: string
-    backToHome: string
     privacy: string
     urlLabel: string
     fetch: string
@@ -76,7 +74,6 @@ const COPY: Record<Locale, CopySet> = {
       title: 'UESTC WebVPN 转换',
       description: '普通 UESTC 链接与 WebVPN 代理链接互转。',
       notice: '本工具仅供电子科技大学在校师生使用，WebVPN 认证须由用户自行完成。',
-      backToHome: '工具箱',
       swapAriaLabel: '切换方向',
       inputLabelEncrypt: '原始链接',
       inputLabelDecrypt: 'WebVPN 链接',
@@ -95,7 +92,6 @@ const COPY: Record<Locale, CopySet> = {
     share: {
       title: 'ChatGPT 分享导出',
       description: '将公开 ChatGPT 分享链接导出为 Markdown 或 ZIP。',
-      backToHome: '工具箱',
       privacy: '为绕过浏览器的跨域限制，分享链接会被发送到本站代理以获取 HTML。代理不存储、记录或保留链接和对话内容；解析与文件导出始终在你的浏览器中完成。你也可以直接上传已保存的 HTML，避免将对话发送到代理。',
       urlLabel: 'ChatGPT 分享链接',
       fetch: '获取并解析',
@@ -136,7 +132,6 @@ const COPY: Record<Locale, CopySet> = {
       description: 'Convert between plain UESTC URLs and WebVPN-proxied URLs.',
       notice:
         'This tool is intended for UESTC students and staff only. WebVPN authentication is your own responsibility.',
-      backToHome: 'Toolbox',
       swapAriaLabel: 'Switch direction',
       inputLabelEncrypt: 'Plain URL',
       inputLabelDecrypt: 'WebVPN URL',
@@ -155,7 +150,6 @@ const COPY: Record<Locale, CopySet> = {
     share: {
       title: 'ChatGPT Share Export',
       description: 'Export a public ChatGPT shared conversation as Markdown or a ZIP.',
-      backToHome: 'Toolbox',
       privacy: 'To work around browser cross-origin restrictions, your share link is sent to our proxy to retrieve its HTML. The proxy does not store, log, or retain the link or conversation content; parsing and file export remain in your browser. You can also upload saved HTML directly to avoid sending chats to our proxy.',
       urlLabel: 'ChatGPT shared link',
       fetch: 'Fetch and export',

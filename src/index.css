@@ -109,6 +109,7 @@
 html {
   min-width: 320px;
   font-size: 16.5px;
+  scrollbar-gutter: stable both-edges;
 }
 
 body {
@@ -464,25 +465,6 @@ a {
 }
 
 /* ─── Back link ───────────────────────────────────────────── */
-
-.tool-page-back {
-  justify-self: center;
-  width: min(820px, 100%);
-}
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--muted);
-  transition: color 160ms ease;
-}
-
-.back-link:hover {
-  color: var(--ink);
-}
 
 /* ─── Card primitive ──────────────────────────────────────── */
 
@@ -909,10 +891,6 @@ a {
   animation: fadeSlideUp 350ms ease-out 50ms both;
 }
 
-.markdown-hero .back-link {
-  margin-bottom: 22px;
-}
-
 .markdown-hero h1 {
   margin: 0 0 8px;
   font-size: clamp(1.7rem, 3vw, 2.35rem);
@@ -1310,10 +1288,6 @@ a {
 
   .tool-actions {
     flex-wrap: wrap;
-  }
-
-  .markdown-hero .back-link {
-    margin-bottom: 18px;
   }
 
   .markdown-workspace {

@@ -1,5 +1,5 @@
 import { useDeferredValue, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
 
@@ -98,7 +98,6 @@ export function MarkdownViewerPage() {
         preview: '预览',
         drop: '把 .md 文件拖到这里',
         empty: '从左侧开始输入，预览会实时更新。',
-        back: '工具箱',
         layout: '布局',
         sideBySide: '并排',
         sideBySideCompact: '并排',
@@ -119,7 +118,6 @@ export function MarkdownViewerPage() {
         preview: 'Preview',
         drop: 'Drop a .md file here',
         empty: 'Start writing on the left. Your preview updates as you type.',
-        back: 'Toolbox',
         layout: 'Layout',
         sideBySide: 'Side by side',
         sideBySideCompact: 'Split',
@@ -172,10 +170,6 @@ export function MarkdownViewerPage() {
   return (
     <section className="page page--markdown">
       <div className="markdown-hero">
-        <Link to="/" className="back-link">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-          {labels.back}
-        </Link>
         <h1>{labels.title}</h1>
         <p>{labels.description}</p>
       </div>
