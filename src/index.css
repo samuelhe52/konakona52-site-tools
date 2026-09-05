@@ -482,6 +482,305 @@ a {
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
+/* ─── UESTC tools collection ─────────────────────────────── */
+
+.page--uestc {
+  gap: 16px;
+}
+
+.uestc-section {
+  gap: 22px;
+}
+
+.uestc-section__heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.uestc-section__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.uestc-section__title {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.uestc-section__description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.uestc-steps {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding-left: 22px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.uestc-steps li::marker {
+  color: var(--soft);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.uestc-steps ul {
+  display: grid;
+  gap: 5px;
+  margin: 7px 0 0;
+  padding-left: 20px;
+}
+
+.uestc-steps ul li::marker {
+  font-size: 0.66rem;
+}
+
+.uestc-script-body {
+  display: grid;
+  gap: 22px;
+  align-items: start;
+}
+
+.uestc-script-body--configured {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  gap: 28px;
+}
+
+.uestc-script-controls {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.uestc-script-body--configured .uestc-script-controls {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.uestc-script-body--configured > .uestc-steps {
+  align-self: center;
+}
+
+.uestc-script-body--configured .uestc-script-actions {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.uestc-script-body--configured .uestc-script-copy-button {
+  width: 100%;
+}
+
+.uestc-calendar-date {
+  display: grid;
+  gap: 8px;
+}
+
+.uestc-calendar-date__label {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.uestc-calendar-date__input {
+  min-width: 0;
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.uestc-calendar-date__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+  outline: none;
+}
+
+.uestc-calendar-date__input--error {
+  border-color: var(--error);
+}
+
+.uestc-calendar-date__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.uestc-calendar-date__hint--error {
+  color: var(--error);
+}
+
+.uestc-script-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.button.uestc-script-copy-button {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.button.uestc-script-copy-button:active:not(:disabled) {
+  transform: none;
+}
+
+.button.uestc-script-copy-button[aria-busy='true'] {
+  cursor: progress;
+}
+
+.button.uestc-script-copy-button:focus-visible:not(:disabled) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.uestc-script-copy-content {
+  display: grid;
+}
+
+.uestc-script-copy-content > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.uestc-script-copy-content__visible {
+  animation: uestc-copy-content-in 160ms ease-out;
+}
+
+.uestc-script-copy-content__measure {
+  visibility: hidden;
+}
+
+@keyframes uestc-copy-content-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button.uestc-script-copy-button {
+    transition: none;
+  }
+
+  .uestc-script-copy-content__visible {
+    animation: none;
+  }
+}
+
+.uestc-script-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: color 160ms ease;
+}
+
+.uestc-script-link:hover,
+.uestc-script-link:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.uestc-script-status,
+.uestc-attribution {
+  margin: -10px 0 0;
+  color: var(--soft);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.uestc-script-status--error {
+  color: var(--error);
+}
+
+.uestc-attribution {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 760px) {
+  .uestc-script-body--configured {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .uestc-script-body--configured > .uestc-steps {
+    align-self: start;
+  }
+}
+
+.uestc-attribution a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.uestc-attribution a:hover,
+.uestc-attribution a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+  outline: none;
+}
+
+.uestc-privacy {
+  margin-top: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ─── Tool notice ─────────────────────────────────────────── */
 
 .tool-notice {
@@ -1262,6 +1561,14 @@ a {
 
   .tool-surface {
     padding: 20px;
+  }
+
+  .uestc-section {
+    gap: 18px;
+  }
+
+  .uestc-section__heading {
+    gap: 12px;
   }
 
   .tool-hero .home-hero__subtitle {

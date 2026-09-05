@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import type { Locale } from './lib/locale'
 import { detectLocale, parseLocaleOverride } from './lib/locale'
 import { HomePage } from './pages/HomePage'
 import { ChatGptSharePage } from './pages/ChatGptSharePage'
-import { UestcVpnPage } from './pages/UestcVpnPage'
+import { UestcToolsPage } from './pages/UestcToolsPage'
 
 const MarkdownViewerPage = lazy(async () => {
   const module = await import('./pages/MarkdownViewerPage')
@@ -14,6 +14,11 @@ const MarkdownViewerPage = lazy(async () => {
 
 type AppProps = {
   locale?: Locale
+}
+
+function UestcLegacyRedirect() {
+  const { search } = useLocation()
+  return <Navigate to={{ pathname: '/uestc', search }} replace />
 }
 
 function readNavigatorLanguages(): readonly string[] {
@@ -52,7 +57,8 @@ function App({ locale }: AppProps) {
             </Suspense>
           )}
         />
-        <Route path="uestc-vpn" element={<UestcVpnPage />} />
+        <Route path="uestc" element={<UestcToolsPage />} />
+        <Route path="uestc-vpn" element={<UestcLegacyRedirect />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

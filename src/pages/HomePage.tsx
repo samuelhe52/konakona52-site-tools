@@ -30,7 +30,7 @@ export function HomePage() {
           <h2 className="tool-card__title">{copy.home.markdownTitle}</h2>
           <p className="tool-card__desc">{copy.home.markdownDescription}</p>
         </Link>
-        <Link to="/uestc-vpn" className="tool-card">
+        <Link to="/uestc" className="tool-card">
           <div className="tool-card__header">
             <span className="tool-card__icon">
               <svg
