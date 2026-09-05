@@ -71,7 +71,7 @@ type ScriptSectionProps = {
   number: string
   title: string
   description: string
-  steps: readonly [string, string]
+  steps: readonly string[]
   consoleStep: string
   consoleInstructions: readonly [string, string]
   scriptPath: string
@@ -190,7 +190,7 @@ function ScriptSection({
               {consoleInstructions.map((instruction) => <li key={instruction}>{instruction}</li>)}
             </ul>
           </li>
-          <li>{steps[1]}</li>
+          {steps.slice(1).map((step) => <li key={step}>{step}</li>)}
         </ol>
         <div className="uestc-script-controls">
           {configuration}

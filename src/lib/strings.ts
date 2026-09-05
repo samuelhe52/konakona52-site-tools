@@ -21,7 +21,7 @@ export type CopySet = {
     pdfSteps: readonly [string, string]
     calendarTitle: string
     calendarDescription: string
-    calendarSteps: readonly [string, string]
+    calendarSteps: readonly [string, string, string]
     calendarStartDateLabel: string
     calendarStartDateHint: string
     calendarStartDateInvalid: string
@@ -110,6 +110,7 @@ const COPY: Record<Locale, CopySet> = {
       calendarSteps: [
         '打开教务系统的“我的课表”。',
         '粘贴脚本并回车；课表 ICS 将自动下载。',
+        'iOS：将下载的 ICS 文件保存到“文件”App，然后将它拖入“日历”App 并松开。',
       ],
       calendarStartDateLabel: '第一周周一日期（可选）',
       calendarStartDateHint: '留空则自动推断。如果控制台提示“开始日期不合法”，请选择第一周的周一，再次复制脚本。',
@@ -200,6 +201,7 @@ const COPY: Record<Locale, CopySet> = {
       calendarSteps: [
         'Open “My Timetable” in the course system.',
         'Paste the script and press Enter; the timetable ICS downloads automatically.',
+        'iOS: save the downloaded ICS file to the Files app, then drag it into the Calendar app and release.',
       ],
       calendarStartDateLabel: 'First Monday of week 1 (optional)',
       calendarStartDateHint: 'Leave blank for automatic detection. If the console reports an invalid start date, choose the Monday that starts week 1 and copy the script again.',
