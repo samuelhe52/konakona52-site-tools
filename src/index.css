@@ -619,6 +619,12 @@ a {
     box-shadow 160ms ease;
 }
 
+@supports (-webkit-touch-callout: none) {
+  .uestc-calendar-date__input {
+    padding-inline: 0;
+  }
+}
+
 .uestc-calendar-date__input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-subtle);
