@@ -4,8 +4,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SSH_HOST="${SSH_HOST:-serJP}"
-DOMAIN="${DOMAIN:-tools.konakona52.com}"
-REMOTE_SITE_ROOT="${REMOTE_SITE_ROOT:-/var/www/${DOMAIN}}"
+DOMAIN="${DOMAIN:-tools.konakona.dev}"
+REMOTE_SITE_ROOT="${REMOTE_SITE_ROOT:-/var/www/tools.konakona52.com}"
 RELEASE_ID="${RELEASE_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$(git rev-parse --short=12 HEAD)}"
 REMOTE_RELEASE_DIR="${REMOTE_RELEASE_DIR:-${REMOTE_SITE_ROOT}/releases/${RELEASE_ID}}"
 

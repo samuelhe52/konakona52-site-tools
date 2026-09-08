@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SSH_HOST="${SSH_HOST:-serJP}"
-DOMAIN="${DOMAIN:-tools.konakona52.com}"
+DOMAIN="${DOMAIN:-tools.konakona.dev}"
 REMOTE_PROXY_DIR="${REMOTE_PROXY_DIR:-/opt/konakona52-chatgpt-share-proxy}"
 
 main() {

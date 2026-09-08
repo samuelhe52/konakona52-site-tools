@@ -7,7 +7,7 @@ the public share HTML that browsers cannot retrieve cross-origin.
 ## Default target
 
 - SSH host: `serJP`
-- Domain: `tools.konakona52.com`
+- Domain: `tools.konakona.dev` (legacy `.com` remains dual-served during migration)
 - Release root on server: `/var/www/tools.konakona52.com/releases`
 - Live site symlink: `/var/www/tools.konakona52.com/current`
 - Proxy service: `konakona-chatgpt-share-proxy.service` on `127.0.0.1:8765`
@@ -54,7 +54,7 @@ proxy error is not an acceptable substitute for the normal URL workflow.
 These environment variables can be set when you need a different target:
 
 ```bash
-SSH_HOST=serJP DOMAIN=tools.konakona52.com make deploy
+SSH_HOST=serJP DOMAIN=tools.konakona.dev make deploy
 ```
 
 Optional:

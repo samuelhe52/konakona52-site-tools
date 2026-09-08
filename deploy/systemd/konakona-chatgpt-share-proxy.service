@@ -25,7 +25,7 @@ MemoryMax=96M
 CPUQuota=25%
 UMask=0077
 Environment=PYTHONDONTWRITEBYTECODE=1
-Environment=ALLOWED_ORIGINS=https://tools.konakona52.com
+Environment=ALLOWED_ORIGINS=https://tools.konakona52.com,https://tools.konakona.dev
 
 [Install]
 WantedBy=multi-user.target

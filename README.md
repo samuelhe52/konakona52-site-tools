@@ -2,7 +2,7 @@
 
 A small bilingual collection of browser-based utilities built with React and Vite.
 
-Deployed at [tools.konakona52.com](https://tools.konakona52.com).
+Deployed at [tools.konakona.dev](https://tools.konakona.dev).
 
 - Convert between plain UESTC URLs and WebVPN URLs, download PDFs embedded in announcements, and export course calendars.
 - Export public ChatGPT shared conversations as Markdown or ZIP.
