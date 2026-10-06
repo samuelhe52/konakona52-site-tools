@@ -4,6 +4,16 @@ import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
 
 type WorkspaceLayout = 'split' | 'full'
+type Notice = 'unsupportedFile' | 'pasteBlocked' | null
+
+const MARKDOWN_EXTENSIONS = ['.md', '.markdown', '.mdown', '.mkd', '.txt']
+
+function isMarkdownFile(file: File): boolean {
+  const name = file.name.toLowerCase()
+  return MARKDOWN_EXTENSIONS.some((extension) => name.endsWith(extension))
+    || file.type === 'text/markdown'
+    || file.type === 'text/plain'
+}
 type FullView = 'source' | 'rendered'
 
 const STARTER_MARKDOWN = `# A fresh Markdown preview
@@ -81,7 +91,9 @@ export function MarkdownViewerPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [workspaceLayout, setWorkspaceLayout] = useState<WorkspaceLayout>('split')
   const [fullView, setFullView] = useState<FullView>('rendered')
+  const [notice, setNotice] = useState<Notice>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<HTMLTextAreaElement>(null)
   const isChinese = locale === 'zh-CN'
   const deferredSource = useDeferredValue(source)
 
@@ -105,6 +117,8 @@ export function MarkdownViewerPage() {
         fullView: '全宽视图',
         source: '源码',
         rendered: '渲染',
+        unsupportedFile: '仅支持 .md、.markdown 或 .txt 文件。',
+        pasteBlocked: '浏览器未允许读取剪贴板，请在编辑区按 ⌘V / Ctrl+V 粘贴。',
       }
     : {
         title: 'Preview Markdown, instantly',
@@ -125,16 +139,22 @@ export function MarkdownViewerPage() {
         fullView: 'Full view',
         source: 'Source',
         rendered: 'Rendered',
+        unsupportedFile: 'Only .md, .markdown, or .txt files are supported.',
+        pasteBlocked: 'Clipboard access was blocked. Press ⌘V / Ctrl+V in the editor to paste.',
       }
 
   function loadFile(file: File | undefined) {
     if (!file) return
-    if (!file.name.toLowerCase().endsWith('.md') && file.type !== 'text/markdown') return
+    if (!isMarkdownFile(file)) {
+      setNotice('unsupportedFile')
+      return
+    }
 
     const reader = new FileReader()
     reader.onload = () => {
       setSource(typeof reader.result === 'string' ? reader.result : '')
       setFileName(file.name)
+      setNotice(null)
     }
     reader.readAsText(file)
   }
@@ -150,9 +170,12 @@ export function MarkdownViewerPage() {
       if (clipboardText) {
         setSource(clipboardText)
         setFileName(null)
+        setNotice(null)
       }
     } catch {
-      inputRef.current?.focus()
+      setNotice('pasteBlocked')
+      if (workspaceLayout === 'full') setFullView('source')
+      window.requestAnimationFrame(() => editorRef.current?.focus())
     }
   }
 
@@ -178,7 +201,10 @@ export function MarkdownViewerPage() {
         className={`markdown-workspace ${isDragging ? 'markdown-workspace--dragging' : ''}`}
         onDragEnter={(event) => { event.preventDefault(); setIsDragging(true) }}
         onDragOver={(event) => event.preventDefault()}
-        onDragLeave={() => setIsDragging(false)}
+        onDragLeave={(event) => {
+          // Ignore drag-leave events fired when moving between child elements.
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsDragging(false)
+        }}
         onDrop={handleDrop}
       >
         {isDragging && <div className="markdown-drop-zone">{labels.drop}</div>}
@@ -202,7 +228,7 @@ export function MarkdownViewerPage() {
             ) : null}
           </div>
           <div className="markdown-workspace__actions">
-            <input ref={inputRef} className="markdown-file-input" type="file" accept=".md,text/markdown" onChange={handleUpload} />
+            <input ref={inputRef} className="markdown-file-input" type="file" accept=".md,.markdown,.mdown,.mkd,.txt,text/markdown,text/plain" onChange={handleUpload} />
             <button className="markdown-action markdown-action--secondary" type="button" aria-label={labels.import} onClick={() => inputRef.current?.click()}>
               <UploadIcon />
               <span className="markdown-control-label markdown-control-label--full">{labels.import}</span>
@@ -214,8 +240,11 @@ export function MarkdownViewerPage() {
               <span className="markdown-control-label markdown-control-label--compact">{labels.pasteCompact}</span>
             </button>
             <span className="markdown-toolbar-divider" aria-hidden="true" />
-            <button className="markdown-action markdown-action--secondary" type="button" onClick={() => { setSource(''); setFileName(null) }}><ClearIcon />{labels.clear}</button>
+            <button className="markdown-action markdown-action--secondary" type="button" onClick={() => { setSource(''); setFileName(null); setNotice(null) }}><ClearIcon />{labels.clear}</button>
           </div>
+        </div>
+        <div className="status-region" role="status" aria-live="polite">
+          {notice ? <p className="markdown-notice">{labels[notice]}</p> : null}
         </div>
         <div className={`markdown-workspace__body ${workspaceLayout === 'full' ? 'markdown-workspace__body--full' : ''}`}>
           {showEditor ? (
@@ -224,8 +253,9 @@ export function MarkdownViewerPage() {
                 <span>{labels.editor}</span>
               </div>
               <textarea
+                ref={editorRef}
                 value={source}
-                onChange={(event) => { setSource(event.target.value); setFileName(null) }}
+                onChange={(event) => { setSource(event.target.value); setFileName(null); setNotice(null) }}
                 className="markdown-editor"
                 aria-label={labels.editor}
                 spellCheck={false}

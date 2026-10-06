@@ -361,6 +361,7 @@ export function UestcToolsPage() {
             placeholder={copy.tool.outputPlaceholder}
             className={isError ? 'url-input--error' : undefined}
             readOnly
+            onFocus={(event) => event.currentTarget.select()}
             trailingButton={output && !isError ? (
               <button type="button" className={`url-field__copy-btn${copyState === 'copied' ? ' url-field__copy-btn--copied' : ''}`} aria-label={copy.tool.copy} onClick={() => void handleCopyAsync()}>
                 {copyState === 'copied' ? <CheckIcon /> : <CopyIcon />}
@@ -384,11 +385,13 @@ export function UestcToolsPage() {
           </Button>
         </div>
 
-        {isError && output ? (
-          <p className="status-msg status-msg--error">{copy.tool.convertFailed}</p>
-        ) : !canJump && output ? (
-          <p className="status-msg status-msg--error">{copy.tool.jumpUnavailable}</p>
-        ) : null}
+        <div className="status-region" role="status" aria-live="polite">
+          {isError && output ? (
+            <p className="status-msg status-msg--error">{copy.tool.convertFailed}</p>
+          ) : !canJump && output ? (
+            <p className="status-msg status-msg--error">{copy.tool.jumpUnavailable}</p>
+          ) : null}
+        </div>
       </Card>
 
       <ScriptSection number="02" title={copy.uestc.pdfTitle} description={copy.uestc.pdfDescription} steps={copy.uestc.pdfSteps} consoleStep={copy.uestc.consoleStep} consoleInstructions={copy.uestc.consoleInstructions} scriptPath={PDF_SCRIPT_PATH} labels={scriptLabels} />

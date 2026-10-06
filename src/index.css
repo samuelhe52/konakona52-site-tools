@@ -518,7 +518,8 @@ a {
 }
 
 .uestc-section {
-  gap: 22px;
+  --stack-gap: 22px;
+  gap: var(--stack-gap);
 }
 
 .uestc-section__heading {
@@ -915,7 +916,7 @@ a {
 }
 
 .url-input-wrap:has(.url-field__copy-btn) .url-input:read-only {
-  cursor: pointer;
+  cursor: text;
 }
 
 /* ─── Inline copy button ──────────────────────────────────── */
@@ -957,6 +958,13 @@ a {
   color: var(--success);
 }
 
+/* Touch screens have no hover, so keep the inline copy button visible. */
+@media (hover: none) {
+  .url-field__copy-btn {
+    opacity: 1;
+  }
+}
+
 .url-input--error {
   color: var(--error);
   background: var(--error-bg);
@@ -993,6 +1001,11 @@ a {
 
 .status-msg--error {
   color: var(--error);
+}
+
+/* Live regions stay mounted so updates are announced; collapse the grid gap while empty. */
+.status-region:empty {
+  margin-top: calc(-1 * var(--stack-gap, 0px));
 }
 
 /* ─── Buttons ─────────────────────────────────────────────── */
@@ -1057,9 +1070,9 @@ a {
 
 /* ─── ChatGPT share export ───────────────────────────────── */
 
-.share-surface,
-.share-result {
-  gap: 20px;
+.share-surface {
+  --stack-gap: 20px;
+  gap: var(--stack-gap);
 }
 
 .share-privacy {
@@ -1369,6 +1382,16 @@ a {
 
 .markdown-file-input { display: none; }
 
+.markdown-notice {
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--error-border);
+  background: var(--error-bg);
+  color: var(--error);
+  font-size: 0.82rem;
+  animation: fadeIn 160ms ease-out;
+}
+
 .markdown-editor {
   width: 100%;
   min-height: 0;
@@ -1565,7 +1588,7 @@ a {
   }
 
   .uestc-section {
-    gap: 18px;
+    --stack-gap: 18px;
   }
 
   .uestc-section__heading {
