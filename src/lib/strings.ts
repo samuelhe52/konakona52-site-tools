@@ -101,7 +101,7 @@ const COPY: Record<Locale, CopySet> = {
     },
     home: {
       title: '顺手的小工具',
-      subtitle: '都在浏览器里运行，无需安装，也不需要账号。',
+      subtitle: '全部在浏览器中运行，免安装、免登录。',
       toolTitle: 'UESTC 工具',
       toolDescription: '让你的成电生活轻松一点。',
       chatgptShareTitle: 'ChatGPT 分享导出',

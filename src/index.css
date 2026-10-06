@@ -178,6 +178,17 @@ a {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ─── Shell ─────────────────────────────────────────────── */
 
 .site-frame {
@@ -373,6 +384,7 @@ a {
 
 .home-hero__title {
   margin: 0 0 6px;
+  text-wrap: balance;
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -381,6 +393,7 @@ a {
 
 .home-hero__subtitle {
   margin: 0;
+  text-wrap: pretty;
   font-size: 0.98rem;
   color: var(--muted);
   line-height: 1.5;
@@ -474,6 +487,7 @@ a {
 
 .tool-card__desc {
   margin: 0;
+  text-wrap: pretty;
   font-size: 0.93rem;
   color: var(--muted);
   line-height: 1.45;
@@ -552,6 +566,7 @@ a {
 
 .uestc-section__description {
   margin: 0;
+  text-wrap: pretty;
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.5;
