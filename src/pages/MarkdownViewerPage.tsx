@@ -169,9 +169,9 @@ export function MarkdownViewerPage() {
 
   return (
     <section className="page page--markdown">
-      <div className="markdown-hero">
-        <h1>{labels.title}</h1>
-        <p>{labels.description}</p>
+      <div className="home-hero">
+        <h1 className="home-hero__title">{labels.title}</h1>
+        <p className="home-hero__subtitle">{labels.description}</p>
       </div>
 
       <div
