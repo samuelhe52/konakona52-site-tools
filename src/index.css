@@ -131,6 +131,11 @@ a {
   text-decoration: none;
 }
 
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 #root {
   min-height: 100vh;
   min-height: 100dvh;
@@ -179,10 +184,6 @@ a {
   animation: fadeIn 300ms ease-out;
 }
 
-.site-backdrop {
-  display: none;
-}
-
 .topbar,
 .page-shell,
 .site-footer {
@@ -206,8 +207,10 @@ a {
 
 .brand {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .brand__icon {
@@ -244,6 +247,28 @@ a {
   transition: color 160ms ease;
 }
 
+.topbar__trail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.topbar__separator {
+  color: var(--border-strong);
+  font-size: 1.05rem;
+  font-weight: 300;
+}
+
+.topbar__current {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .topbar__right {
   display: flex;
   align-items: center;
@@ -274,7 +299,6 @@ a {
   border-color: var(--border-strong);
   background: var(--surface-muted);
   color: var(--ink);
-  outline: none;
 }
 
 /* ─── Footer ─────────────────────────────────────────────── */
@@ -407,7 +431,6 @@ a {
 .tool-card:focus-visible {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
-  outline: none;
 }
 
 .tool-card__icon {
@@ -669,11 +692,6 @@ a {
   cursor: progress;
 }
 
-.button.uestc-script-copy-button:focus-visible:not(:disabled) {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
 .uestc-script-copy-content {
   display: grid;
 }
@@ -722,7 +740,6 @@ a {
 .uestc-script-link:hover,
 .uestc-script-link:focus-visible {
   color: var(--accent);
-  outline: none;
 }
 
 .uestc-script-status,
@@ -768,7 +785,6 @@ a {
 .uestc-attribution a:focus-visible {
   color: var(--accent);
   text-decoration-color: currentColor;
-  outline: none;
 }
 
 .uestc-privacy {
@@ -833,7 +849,6 @@ a {
   border-color: var(--border-strong);
   background: var(--surface-muted);
   color: var(--ink);
-  outline: none;
 }
 
 .swap-btn:active {
@@ -930,7 +945,6 @@ a {
 .url-field__copy-btn:hover {
   color: var(--ink);
   background: var(--surface-hover);
-  outline: none;
 }
 
 .url-field__copy-btn--copied {
@@ -995,11 +1009,6 @@ a {
     color 160ms ease,
     box-shadow 160ms ease,
     transform 80ms ease;
-}
-
-.button:hover:not(:disabled),
-.button:focus-visible:not(:disabled) {
-  outline: none;
 }
 
 .button:active:not(:disabled) {
@@ -1538,6 +1547,15 @@ a {
 
   .topbar {
     padding-bottom: 24px;
+  }
+
+  .topbar__trail--nested .brand__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .home-hero__title {

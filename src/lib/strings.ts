@@ -2,7 +2,15 @@ import type { Locale } from './locale'
 
 export type CopySet = {
   siteTitle: string
+  shell: {
+    themeLight: string
+    themeDark: string
+    themeSystem: string
+    themeCycle: string
+  }
   home: {
+    title: string
+    subtitle: string
     toolTitle: string
     toolDescription: string
     chatgptShareTitle: string
@@ -85,7 +93,15 @@ export type CopySet = {
 const COPY: Record<Locale, CopySet> = {
   'zh-CN': {
     siteTitle: "Kona's Toolbox",
+    shell: {
+      themeLight: '浅色模式',
+      themeDark: '深色模式',
+      themeSystem: '跟随系统',
+      themeCycle: '点击切换主题',
+    },
     home: {
+      title: '顺手的小工具',
+      subtitle: '都在浏览器里运行，无需安装，也不需要账号。',
       toolTitle: 'UESTC 工具',
       toolDescription: '让你的成电生活轻松一点。',
       chatgptShareTitle: 'ChatGPT 分享导出',
@@ -176,7 +192,15 @@ const COPY: Record<Locale, CopySet> = {
   },
   en: {
     siteTitle: "Kona's Toolbox",
+    shell: {
+      themeLight: 'Light mode',
+      themeDark: 'Dark mode',
+      themeSystem: 'Match system',
+      themeCycle: 'Click to change theme',
+    },
     home: {
+      title: 'Small, handy tools',
+      subtitle: 'Everything runs in your browser. No install, no account.',
       toolTitle: 'UESTC Tools',
       toolDescription: 'Make your life at UESTC a little easier.',
       chatgptShareTitle: 'ChatGPT Share Export',
