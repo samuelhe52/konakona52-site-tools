@@ -2,6 +2,7 @@ import { useDeferredValue, useRef, useState, type ChangeEvent, type DragEvent } 
 import { useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
+import { ToolHeader } from '../components/Primitives'
 
 type WorkspaceLayout = 'split' | 'full'
 type Notice = 'unsupportedFile' | 'pasteBlocked' | null
@@ -192,10 +193,7 @@ export function MarkdownViewerPage() {
 
   return (
     <section className="page page--markdown">
-      <div className="home-hero">
-        <h1 className="home-hero__title">{labels.title}</h1>
-        <p className="home-hero__subtitle">{labels.description}</p>
-      </div>
+      <ToolHeader index="02" path="/markdown-viewer" title={labels.title} description={labels.description} />
 
       <div
         className={`markdown-workspace ${isDragging ? 'markdown-workspace--dragging' : ''}`}

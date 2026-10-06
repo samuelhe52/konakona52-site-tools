@@ -21,7 +21,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
-          theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
+          theme: document.documentElement.classList.contains('dark') ? 'dark' : 'neutral',
         })
 
         const { svg: renderedSvg } = await mermaid.render(`mermaid-${chartId}`, chart)

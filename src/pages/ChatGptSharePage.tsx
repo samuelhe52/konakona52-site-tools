@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
-import { Button, Card, InputField } from '../components/Primitives'
+import { Button, Card, InputField, ToolHeader } from '../components/Primitives'
 import {
   fetchSharedHtml,
   markdownFor,
@@ -147,13 +147,9 @@ export function ChatGptSharePage() {
 
   return (
     <section className="page page--tool page--chatgpt-share">
-      <div className="home-hero tool-hero">
-        <h1 className="home-hero__title">{copy.share.title}</h1>
-        <p className="home-hero__subtitle">{copy.share.description}</p>
-      </div>
+      <ToolHeader index="01" path="/chatgpt-share" title={copy.share.title} description={copy.share.description} />
       <Card className="tool-surface share-surface">
         <div className="share-privacy" role="note">
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="M9 12l2 2 4-4" /></svg>
           <p>{copy.share.privacy}</p>
         </div>
         <form

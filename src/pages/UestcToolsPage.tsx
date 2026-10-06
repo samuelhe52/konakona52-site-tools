@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { Button, Card, InputField } from '../components/Primitives'
+import { Button, Card, InputField, ToolHeader } from '../components/Primitives'
 import type { AppOutletContext } from '../components/AppShell'
 import { decryptUrl, encryptUrl, isLikelyNavigableUrl, parseConversionResult } from '../lib/webvpn'
 
@@ -323,10 +323,7 @@ export function UestcToolsPage() {
 
   return (
     <section className="page page--tool page--uestc">
-      <div className="home-hero tool-hero">
-        <h1 className="home-hero__title">{copy.uestc.title}</h1>
-        <p className="home-hero__subtitle">{copy.uestc.description}</p>
-      </div>
+      <ToolHeader index="03" path="/uestc" title={copy.uestc.title} description={copy.uestc.description} />
 
       <Card className="tool-surface uestc-section">
         <div className="uestc-section__heading">

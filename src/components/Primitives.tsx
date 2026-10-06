@@ -52,3 +52,23 @@ export function InputField({ className, label, trailingButton, ...props }: Input
     </label>
   )
 }
+
+type ToolHeaderProps = {
+  index: string
+  path: string
+  title: string
+  description: string
+}
+
+export function ToolHeader({ index, path, title, description }: ToolHeaderProps) {
+  return (
+    <header className="page-header">
+      <p className="page-header__meta" aria-hidden="true">
+        <span className="page-header__index">{index}</span>
+        <span>{path}</span>
+      </p>
+      <h1 className="page-header__title">{title}</h1>
+      <p className="page-header__lede">{description}</p>
+    </header>
+  )
+}
