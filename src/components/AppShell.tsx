@@ -99,6 +99,7 @@ export function AppShell({ locale }: AppShellProps) {
       <footer className="site-footer">
         <span>© {year} konakona</span>
         <div className="footer-links">
+          <a href={locale === 'zh-CN' ? 'https://konakona.dev/zh/' : 'https://konakona.dev/'}>about</a>
           <a href="mailto:samuelhe52@outlook.com">mail</a>
           <a href="https://github.com/samuelhe52" target="_blank" rel="noopener noreferrer">
             github<span aria-hidden="true">↗</span>
