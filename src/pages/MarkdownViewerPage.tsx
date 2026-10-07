@@ -1,4 +1,4 @@
-import { useDeferredValue, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
+import { useDeferredValue, useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { AppOutletContext } from '../components/AppShell'
 import { MarkdownPreview } from '../components/MarkdownPreview'
@@ -8,6 +8,7 @@ type WorkspaceLayout = 'split' | 'full'
 type Notice = 'unsupportedFile' | 'pasteBlocked' | null
 
 const MARKDOWN_EXTENSIONS = ['.md', '.markdown', '.mdown', '.mkd', '.txt']
+const MARKDOWN_STORAGE_KEY = 'markdown-viewer-source'
 
 function isMarkdownFile(file: File): boolean {
   const name = file.name.toLowerCase()
@@ -87,7 +88,14 @@ function ClearIcon() {
 
 export function MarkdownViewerPage() {
   const { locale } = useOutletContext<AppOutletContext>()
-  const [source, setSource] = useState(STARTER_MARKDOWN)
+  const [source, setSource] = useState(() => {
+    try {
+      return localStorage.getItem(MARKDOWN_STORAGE_KEY) ?? STARTER_MARKDOWN
+    } catch {
+      // Storage may be unavailable; the viewer still works without persistence.
+      return STARTER_MARKDOWN
+    }
+  })
   const [fileName, setFileName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [workspaceLayout, setWorkspaceLayout] = useState<WorkspaceLayout>('split')
@@ -97,6 +105,14 @@ export function MarkdownViewerPage() {
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const isChinese = locale === 'zh-CN'
   const deferredSource = useDeferredValue(source)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MARKDOWN_STORAGE_KEY, source)
+    } catch {
+      // Storage may be unavailable or full; keep the current document in memory.
+    }
+  }, [source])
 
   const labels = isChinese
     ? {
