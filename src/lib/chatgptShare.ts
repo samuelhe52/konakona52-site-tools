@@ -159,12 +159,25 @@ function unpackPool(pool: unknown[]): UnknownRecord {
 }
 
 function decodePayload(html: string): UnknownRecord {
-  const match = html.match(
-    /window\.__reactRouterContext\.streamController\.enqueue\(((?:"(?:\\.|[^"\\])*")|(?:'(?:\\.|[^'\\])*'))\)/,
-  )
-  if (!match) throw new Error('Could not find a ChatGPT share payload in this HTML file.')
+  const marker = 'window.__reactRouterContext.streamController.enqueue('
+  const markerIndex = html.indexOf(marker)
+  if (markerIndex === -1) throw new Error('Could not find a ChatGPT share payload in this HTML file.')
 
-  const encoded = JSON.parse(match[1]) as string
+  const start = markerIndex + marker.length
+  if (html[start] !== '"') throw new Error('The shared page payload is not in the expected format.')
+
+  // Safari's regex engine can silently fail on large payloads. Scan the JSON
+  // string instead, skipping escaped characters so quoted content stays intact.
+  let end = start + 1
+  for (; end < html.length; end += 1) {
+    if (html[end] === '\\') end += 1
+    else if (html[end] === '"') break
+  }
+  if (end >= html.length || html[end + 1] !== ')') {
+    throw new Error('The shared page payload is not in the expected format.')
+  }
+
+  const encoded = JSON.parse(html.slice(start, end + 1)) as string
   const pool = JSON.parse(encoded)
   if (!Array.isArray(pool)) throw new Error('The shared page payload is not in the expected format.')
   return unpackPool(pool)
