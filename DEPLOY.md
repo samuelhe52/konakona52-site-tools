@@ -28,6 +28,15 @@ The deploy command will:
 
 Use `make deploy-static` or `make deploy-proxy` for the respective portions.
 
+## Analytics
+
+`public/scripts/analytics.js` loads Cloudflare Web Analytics after `window.load`,
+preserving the current token, SPA tracking and EU exclusion. Deploy this loader
+before disabling automatic RUM injection for this hostname. The hostname-scoped
+Cloudflare rule and cutover instructions live in the Blog repository under
+`infra/cloudflare/manual-analytics.json` and `docs/analytics.md`. Do not disable
+analytics across the whole zone: other hosted applications still use injection.
+
 ## Proxy boundary and privacy
 
 `POST /api/chatgpt-share/fetch` accepts only a ChatGPT share UUID; it constructs the fixed
