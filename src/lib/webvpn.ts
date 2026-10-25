@@ -74,100 +74,70 @@ function decryptText(
     CryptoJS.enc.Utf8.parse(key),
     createCipherOptions(iv),
   )
-  const decoded = new TextDecoder().decode(wordArrayToUint8Array(decrypted))
+  const decoded = new TextDecoder('utf-8', { fatal: true }).decode(wordArrayToUint8Array(decrypted).slice(0, (text.length - iv.length * 2) / 2))
   const textLength = (text.length - iv.length * 2) / 2
 
   return decoded.slice(0, textLength)
 }
 
-function extractUrlLegacy(requiredUrl: string): ExtractedUrl {
-  const url = requiredUrl.trim()
-  let protocol = 'http'
-  let path = ''
-  let port = ''
-  let urlString = url
-
-  for (const candidate of PROTOCOLS) {
-    const prefix = `${candidate}://`
-    if (urlString.slice(0, prefix.length).toLowerCase() === prefix) {
-      protocol = candidate
-      urlString = urlString.slice(prefix.length)
-    }
+function extractUrl(requiredUrl: string): ExtractedUrl {
+  const input = requiredUrl.trim()
+  if (!input || /\s/.test(input) || input.includes('\\')) throw new Error('Enter a valid URL without whitespace or backslashes.')
+  const url = /^[a-z][a-z0-9+.-]*:\/\//i.test(input) ? input : `http://${input}`
+  const parsed = new URL(url)
+  const protocol = parsed.protocol.slice(0, -1)
+  if (!NAVIGABLE_PROTOCOLS.has(parsed.protocol) || !parsed.hostname || parsed.username || parsed.password) {
+    throw new Error('Use an http, https, ssh, vnc, telnet, or rdp URL without credentials.')
   }
-
-  const segments = urlString.split('?')[0].split(':')
-  if (segments.length > 1) {
-    port = segments[1].split('/')[0]
-    urlString =
-      urlString.slice(0, segments[0].length) +
-      urlString.slice(segments[0].length + port.length + 1)
+  if (parsed.hostname.length > 255) throw new Error('The URL host is too long.')
+  const authority = url.slice(url.indexOf('://') + 3).split(/[/?#]/, 1)[0]
+  const port = authority.match(/:(\d+)$/)?.[1] ?? ''
+  if (port && (Number(port) < 1 || Number(port) > 65535)) throw new Error('Use a port between 1 and 65535.')
+  return {
+    url,
+    host: parsed.hostname,
+    path: `${parsed.pathname || '/'}${parsed.search}${parsed.hash}`,
+    port,
+    protocol,
   }
-
-  const pathStart = urlString.indexOf('/')
-  let host = urlString
-  if (pathStart !== -1) {
-    host = urlString.slice(0, pathStart)
-    path = urlString.slice(pathStart)
-  }
-
-  return { url, host, path, port, protocol }
 }
 
 export function encryptUrl(url: string): string {
-  const extracted = extractUrlLegacy(url)
+  const extracted = extractUrl(url)
   const encryptedHost = encryptHost(extracted.host)
+  return `${VPN_HOST}/${extracted.protocol}${extracted.port ? `-${extracted.port}` : ''}/${encryptedHost}${extracted.path}`
+}
 
-  if (extracted.port) {
-    return `${VPN_HOST}/${extracted.protocol}-${extracted.port}/${encryptedHost}${extracted.path}`
+function decodedUrl(url: string): string {
+  const input = url.trim()
+  if (!input || /\s/.test(input) || input.includes('\\')) throw new Error('Enter a valid UESTC WebVPN URL.')
+  const parsed = new URL(input)
+  if (parsed.origin !== VPN_HOST || parsed.username || parsed.password) throw new Error('Use https://webvpn.uestc.edu.cn/.')
+  const match = parsed.pathname.match(/^\/(http|https|ssh|vnc|telnet|rdp)(?:-(\d{1,5}))?\/([a-f0-9]+)(\/.*)?$/i)
+  if (!match) throw new Error('The WebVPN URL has an invalid protocol or encrypted host.')
+  const [, protocol, port = '', host, path = '/'] = match
+  const ivHex = CryptoJS.enc.Utf8.parse(DEFAULT_IV).toString(CryptoJS.enc.Hex)
+  if (!host.toLowerCase().startsWith(ivHex) || host.length <= ivHex.length || host.length % 2 || host.length > ivHex.length + 510) {
+    throw new Error('The WebVPN encrypted host is invalid.')
   }
-
-  return `${VPN_HOST}/${extracted.protocol}/${encryptedHost}${extracted.path}`
+  const decryptedHost = decryptText(host)
+  const result = `${protocol.toLowerCase()}://${decryptedHost}${port ? `:${port}` : ''}${path}${parsed.search}${parsed.hash}`
+  const extracted = extractUrl(result)
+  if (extracted.host !== decryptedHost || /[/?#@]/.test(decryptedHost)) throw new Error('The decrypted host is invalid.')
+  return result
 }
 
 export function decryptUrl(url: string): string {
-  let result = ''
-
   try {
-    if (!url) {
-      throw new Error('URL is required!')
-    }
-
-    const extracted = extractUrlLegacy(url)
-    const segments = extracted.path.split('/')
-    let protocol = 'http'
-    let port = ''
-    let host = ''
-
-    if (segments.length > 1) {
-      const protocolParts = segments[1].split('-')
-      protocol = protocolParts[0]
-      port = protocolParts[1] ?? ''
-      host = segments[2] ?? ''
-    }
-
-    const decryptedHost = decryptText(host)
-    const remainingSegments = segments.slice(3).join('/')
-    result = `${protocol}://${decryptedHost}${port ? `:${port}` : ''}/${remainingSegments}`
-
-    if (!decryptedHost || !host) {
-      throw new Error(
-        'Decrypted host is empty, decryption might be failed! Check if your url, key, iv is correct.',
-      )
-    }
-
-    const parsed = new URL(result)
-    if (!parsed.protocol || !parsed.hostname) {
-      throw new Error(`Decrypted URL is invalid: ${result}`)
-    }
-
-    return result
+    return decodedUrl(url)
   } catch (error) {
-    let errorString = error instanceof Error ? error.message : String(error)
-    if (errorString.includes(DECRYPT_FAILED_SEPARATOR)) {
-      ;[errorString] = errorString.split(DECRYPT_FAILED_SEPARATOR, 1)
-    }
-    return `Decryption failed: ${errorString}${DECRYPT_FAILED_SEPARATOR}${result}`
+    const message = error instanceof Error ? error.message : 'Invalid WebVPN URL.'
+    return `Decryption failed: ${message}${DECRYPT_FAILED_SEPARATOR}`
   }
+}
+
+export function convertWebvpnUrl(direction: 'encode' | 'decode', url: string): string {
+  return direction === 'encode' ? encryptUrl(url) : decodedUrl(url)
 }
 
 export type ConversionResult = { text: string; isError: boolean }

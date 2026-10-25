@@ -11,46 +11,47 @@ import {
   type ShareAttachment,
   type SharedConversation,
 } from '../lib/chatgptShare'
-import { createZip, downloadBlob, safeFilename, type ZipEntry } from '../lib/downloads'
+import { downloadBlob, safeFilename } from '../lib/downloads'
+import { bundleConversation, MAX_ATTACHMENT_BYTES } from '../lib/chatgptBundle'
 
 type State = 'idle' | 'fetching' | 'ready' | 'error' | 'bundling'
 
-const encoder = new TextEncoder()
-const MAX_ATTACHMENT_BYTES = 12 * 1024 * 1024
-
-function attachmentFilename(index: number, attachment: ShareAttachment): string {
-  const basename = attachment.name.replace(/[\\/:*?"<>|]/g, '-').replace(/^\.+/, '') || `attachment-${index + 1}`
-  return `attachments/${String(index + 1).padStart(2, '0')}-${basename}`
-}
-
-function zipBlob(entries: ZipEntry[]): Blob {
-  const bytes = createZip(entries)
-  const copy = new Uint8Array(bytes.byteLength)
-  copy.set(bytes)
-  return new Blob([copy.buffer], { type: 'application/zip' })
-}
-
-async function fetchAttachment(attachment: ShareAttachment): Promise<Uint8Array | undefined> {
+async function fetchAttachment(attachment: ShareAttachment, maxBytes: number): Promise<Uint8Array | undefined> {
   if (!attachment.url) return undefined
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 15_000)
   try {
-    const response = await fetch(attachment.url, { credentials: 'omit' })
-    const length = Number(response.headers.get('content-length') ?? 0)
-    if (!response.ok || (Number.isFinite(length) && length > MAX_ATTACHMENT_BYTES)) return undefined
-    const data = new Uint8Array(await response.arrayBuffer())
-    return data.length <= MAX_ATTACHMENT_BYTES ? data : undefined
+    const response = await fetch(attachment.url, { credentials: 'omit', signal: controller.signal })
+    const limit = Math.min(MAX_ATTACHMENT_BYTES, maxBytes)
+    if (!response.ok || Number(response.headers.get('content-length') ?? 0) > limit || !response.body) {
+      await response.body?.cancel()
+      return undefined
+    }
+    const reader = response.body.getReader()
+    const chunks: Uint8Array[] = []
+    let size = 0
+    for (;;) {
+      const { value, done } = await reader.read()
+      if (done) break
+      size += value.byteLength
+      if (size > limit) {
+        await reader.cancel()
+        return undefined
+      }
+      chunks.push(value)
+    }
+    const bytes = new Uint8Array(size)
+    let offset = 0
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset)
+      offset += chunk.byteLength
+    }
+    return bytes
   } catch {
     return undefined
+  } finally {
+    window.clearTimeout(timer)
   }
-}
-
-function omissionReason(attachment: ShareAttachment): string {
-  if (attachment.availability === 'chatgpt-session-required') {
-    return 'Requires a live ChatGPT browser session to resolve its temporary download URL.'
-  }
-  if (attachment.availability === 'public-share-unavailable') {
-    return 'The public share did not expose the original uploaded file.'
-  }
-  return 'The browser could not retrieve the public file (it may be blocked, too large, or temporarily unavailable).'
 }
 
 export function ChatGptSharePage() {
@@ -109,30 +110,11 @@ export function ChatGptSharePage() {
     setState('bundling')
     setMessage('')
     try {
-      const entries: ZipEntry[] = [{ name: 'conversation.md', data: encoder.encode(markdownFor(conversation)) }]
-      const attachmentStatus = []
-      for (let index = 0; index < conversation.attachments.length; index += 1) {
-        const attachment = conversation.attachments[index]
-        const data = await fetchAttachment(attachment)
-        const filename = data ? attachmentFilename(index, attachment) : undefined
-        if (data && filename) entries.push({ name: filename, data })
-        attachmentStatus.push({
-          name: attachment.name,
-          kind: attachment.kind,
-          availability: attachment.availability,
-          mimeType: attachment.mimeType ?? null,
-          included: Boolean(filename),
-          filename: filename ?? null,
-          reason: filename ? null : omissionReason(attachment),
-        })
-      }
-      entries.push({
-        name: 'attachment-manifest.json',
-        data: encoder.encode(JSON.stringify({ source: conversation.sourceUrl, attachments: attachmentStatus }, null, 2)),
-      })
-      downloadBlob(zipBlob(entries), `${safeFilename(conversation.title)}.zip`)
+      const { bytes, omitted } = await bundleConversation(conversation, fetchAttachment)
+      const buffer = new ArrayBuffer(bytes.byteLength)
+      new Uint8Array(buffer).set(bytes)
+      downloadBlob(new Blob([buffer], { type: 'application/zip' }), `${safeFilename(conversation.title)}.zip`)
       setState('ready')
-      const omitted = attachmentStatus.filter(attachment => !attachment.included).length
       setMessage(omitted > 0 ? copy.share.bundlePartial.replace('{count}', String(omitted)) : copy.share.bundleReady)
     } catch {
       setState('ready')

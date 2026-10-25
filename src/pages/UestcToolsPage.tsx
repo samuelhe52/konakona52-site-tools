@@ -261,8 +261,12 @@ export function UestcToolsPage() {
 
   const { text: output, isError } = useMemo(() => {
     if (!input.trim()) return { text: '', isError: false }
-    const raw = mode === 'encrypt' ? encryptUrl(input) : decryptUrl(input)
-    return parseConversionResult(raw)
+    try {
+      const raw = mode === 'encrypt' ? encryptUrl(input) : decryptUrl(input)
+      return parseConversionResult(raw)
+    } catch (error) {
+      return { text: error instanceof Error ? error.message : 'Invalid URL.', isError: true }
+    }
   }, [input, mode])
 
   useEffect(() => {

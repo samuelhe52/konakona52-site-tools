@@ -203,10 +203,10 @@ export function parseShareUrl(input: string): { shareId: string; sourceUrl: stri
   }
 
   const shareId = parsed.pathname.match(/^\/share\/([^/]+)\/?$/)?.[1]
-  if (parsed.protocol !== 'https:' || parsed.hostname !== 'chatgpt.com' || !shareId || !SHARE_ID_PATTERN.test(shareId)) {
+  if (parsed.protocol !== 'https:' || parsed.hostname !== 'chatgpt.com' || parsed.port || parsed.username || parsed.password || !shareId || !SHARE_ID_PATTERN.test(shareId)) {
     throw new Error('Use a public URL beginning with https://chatgpt.com/share/.')
   }
-  return { shareId, sourceUrl: `https://chatgpt.com/share/${shareId}` }
+  return { shareId: shareId.toLowerCase(), sourceUrl: `https://chatgpt.com/share/${shareId.toLowerCase()}` }
 }
 
 export function parseSharedConversation(html: string, sourceUrl: string): SharedConversation {
@@ -255,7 +255,7 @@ export function markdownFor(conversation: SharedConversation): string {
     '',
     source,
     '>',
-    '> Exported in your browser. Tool internals and hidden reasoning are omitted.',
+    '> Exported from a public ChatGPT share. Tool internals and hidden reasoning are omitted.',
     '',
   ]
   for (const message of conversation.messages) {
@@ -266,7 +266,7 @@ export function markdownFor(conversation: SharedConversation): string {
       for (const attachment of message.attachments) {
         const type = attachment.mimeType ? ` (${attachment.mimeType})` : ''
         const availability = attachment.availability === 'direct'
-          ? ' — included in the ZIP when the browser can retrieve it.'
+          ? ' — included in the ZIP when publicly retrievable; see attachment-manifest.json for the result.'
           : attachment.availability === 'chatgpt-session-required'
             ? ' — not bundled; downloading it requires an active ChatGPT browser session.'
             : ' — not included; the public share does not expose the original file.'

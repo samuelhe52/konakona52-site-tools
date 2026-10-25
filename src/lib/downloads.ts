@@ -99,5 +99,14 @@ export function downloadBlob(blob: Blob, filename: string) {
 }
 
 export function safeFilename(title: string): string {
-  return title.replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim().replace(/[. ]+$/, '') || 'ChatGPT export'
+  const cleaned = title.replace(/[\\/:*?"<>|\p{Cc}]/gu, '-').replace(/\s+/g, ' ').trim()
+  let name = ''
+  let bytes = 0
+  const encoder = new TextEncoder()
+  for (const character of cleaned) {
+    bytes += encoder.encode(character).byteLength
+    if (bytes > 180) break
+    name += character
+  }
+  return name.replace(/^[. ]+|[. ]+$/g, '') || 'ChatGPT export'
 }

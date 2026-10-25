@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/chatgpt-share': 'http://127.0.0.1:8765',
+      '/api': 'http://127.0.0.1:8765',
     },
   },
 })

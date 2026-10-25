@@ -1,0 +1,67 @@
+# Kona's Toolbox
+
+Public HTTP tools at https://tools.konakona.dev. No account, browser, API key,
+Origin header, or JavaScript execution is required for CLI requests.
+Full contract: https://tools.konakona.dev/openapi.json
+
+## ChatGPT Conversation Export
+
+POST https://tools.konakona.dev/api/chatgpt-share/export
+Content-Type: application/json
+Body: {"shareId":"<share UUID>","format":"markdown"}
+Or: {"url":"https://chatgpt.com/share/<share UUID>","format":"zip"}
+Send exactly one of shareId and url. format is required: markdown or zip.
+
+Success returns the actual Markdown or ZIP file, not JSON or an HTML page.
+Read Content-Type and Content-Disposition. Save response bytes directly.
+
+curl --fail-with-body https://tools.konakona.dev/api/chatgpt-share/export \
+  -H 'Content-Type: application/json' \
+  --data '{"shareId":"<share UUID>","format":"markdown"}' -o conversation.md
+
+Use "format":"zip" and -o conversation.zip for a bundle. ZIP contains
+conversation.md, attachment-manifest.json, and retrievable public attachments.
+Read the manifest: 200 does not guarantee every attachment is available.
+Files requiring a ChatGPT login cannot be downloaded through a public share.
+Attachment downloads accept only HTTPS oaiusercontent.com (and its subdomains)
+and oaidalleapiprodscus.blob.core.windows.net, with public IP addresses only.
+Other hosts are omitted with a reason. Maximum 16 file attempts, 12 MiB per
+file, 48 MiB total attachments; two redirects per file and 60 seconds per request.
+Public shares only. Never send ChatGPT cookies or credentials.
+The service retains no export files or conversation content after the request.
+
+## UESTC WebVPN URL converter
+
+POST https://tools.konakona.dev/api/webvpn/convert
+Content-Type: application/json
+Body: {"direction":"encode","url":"https://www.uestc.edu.cn/"}
+Use direction "decode" for an https://webvpn.uestc.edu.cn/ URL.
+Returns JSON: {"direction":"encode","input":"...","output":"..."}.
+Conversion makes no network request. It does not grant university access.
+Supported URL protocols: http, https, ssh, vnc, telnet, rdp. A URL without a
+scheme defaults to http. Credentials, whitespace, and malformed URLs are rejected.
+
+curl --fail-with-body https://tools.konakona.dev/api/webvpn/convert \
+  -H 'Content-Type: application/json' \
+  --data '{"direction":"encode","url":"https://www.uestc.edu.cn/"}'
+
+## Errors and limits
+
+Failures return JSON {"error":"<code>"} and a non-2xx status. Do not save an
+error response as a successful export. Inspect curl exit status and HTTP status.
+400 invalid_request/invalid_url; 403 origin_not_allowed; 404 not_found;
+405 method_not_allowed; 413 request_too_large; 415 unsupported_media_type;
+422 unreadable_conversation; 429 rate_limited; 500 internal_error;
+502 upstream_unavailable; 503 busy; 504 request_timeout.
+
+Request bodies: at most 4 KiB. Share HTML: at most 12 MiB.
+Fetch/export share one limit of 6 requests/minute/IP; conversion allows 60.
+Nginx also limits bursts and concurrent requests. 429/503 include Retry-After.
+At most two active fetch/export requests service-wide. Retry after backoff.
+If you send an Origin header, it must be an allowed site origin.
+Unknown API routes return JSON 404, never the React application.
+GET /api/chatgpt-share/health returns {"status":"ok"}.
+POST /api/chatgpt-share/fetch with {"shareId":"<share UUID>"} returns raw
+upstream HTML for the existing browser UI. Prefer /export for finished files.
+
+Markdown preview and UESTC PDF/calendar scripts have no hosted API.

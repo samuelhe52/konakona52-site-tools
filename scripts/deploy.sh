@@ -19,6 +19,9 @@ main() {
   npm run lint
   npm run build
 
+  # Check the API runtime before publishing discovery docs for the new endpoints.
+  ssh "${SSH_HOST}" "/usr/bin/node --input-type=module -e 'if (Number(process.versions.node.split(\".\")[0]) < 22) process.exit(1)'"
+
   ssh "${SSH_HOST}" "
     set -euo pipefail
     sudo install -d -m 755 -o \$(id -un) -g www-data '${REMOTE_SITE_ROOT}/releases'

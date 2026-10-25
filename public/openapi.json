@@ -1,0 +1,718 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kona's Toolbox API",
+    "version": "1.0.0",
+    "description": "Direct public-share exports and UESTC WebVPN conversion. No authentication required. CLI clients omit Origin; browser clients use a configured site origin. Request limit: 4 KiB. Errors use JSON; downloads return file bytes. Unknown /api/* paths return JSON 404. No stored results or browser bridge."
+  },
+  "servers": [
+    {
+      "url": "https://tools.konakona.dev"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt-share/export": {
+      "post": {
+        "summary": "Download conversation Markdown or ZIP",
+        "operationId": "exportConversation",
+        "description": "Send exactly one of shareId and url, with format markdown or zip. No cookies or credentials. Fetch/export share 6 requests/minute/IP and two active requests service-wide. Share HTML limit 12 MiB; export deadline 60 seconds. ZIP contains conversation.md, attachment-manifest.json and retrievable public files. Attachment limits: 16 attempts, 12 MiB per file, 48 MiB total, two redirects. Allowed file hosts: oaiusercontent.com and its subdomains, and oaidalleapiprodscus.blob.core.windows.net. All destinations must resolve to public addresses. Files needing a ChatGPT login, disallowed hosts, and failed downloads are omitted with reasons. Content stays in memory only for the request.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "shareId",
+                      "format"
+                    ],
+                    "properties": {
+                      "shareId": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "markdown",
+                          "zip"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "url",
+                      "format"
+                    ],
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Public HTTPS chatgpt.com/share/<UUID> URL without credentials or a non-default port."
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "markdown",
+                          "zip"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The requested file. A successful ZIP can omit attachments; read attachment-manifest.json.",
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename with UTF-8 filename*.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request, invalid_url",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "invalid_request"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "origin_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "origin_not_allowed"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "method_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "method_not_allowed"
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "request_too_large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "request_too_large"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "unsupported_media_type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "unsupported_media_type"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "rate_limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "rate_limited"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retry.",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "internal_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "unreadable_conversation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "unreadable_conversation"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "upstream_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "upstream_unavailable"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "busy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "busy"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retry.",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "request_timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "request_timeout"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webvpn/convert": {
+      "post": {
+        "summary": "Encode or decode a UESTC WebVPN URL",
+        "operationId": "convertWebvpn",
+        "description": "No upstream request. Limit: 60 requests/minute/IP. Protocols: http, https, ssh, vnc, telnet, rdp. A missing scheme defaults to http. Rejects credentials and whitespace. Decode accepts only https://webvpn.uestc.edu.cn URLs. Preserves paths, query strings, fragments and explicit ports.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "direction",
+                  "url"
+                ],
+                "properties": {
+                  "direction": {
+                    "type": "string",
+                    "enum": [
+                      "encode",
+                      "decode"
+                    ]
+                  },
+                  "url": {
+                    "type": "string",
+                    "minLength": 1,
+                    "examples": [
+                      "https://www.uestc.edu.cn/"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Converted URL.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "direction",
+                    "input",
+                    "output"
+                  ],
+                  "properties": {
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "encode",
+                        "decode"
+                      ]
+                    },
+                    "input": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request, invalid_url",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "invalid_request"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "origin_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "origin_not_allowed"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "method_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "method_not_allowed"
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "request_too_large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "request_too_large"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "unsupported_media_type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "unsupported_media_type"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "rate_limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "rate_limited"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retry.",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "internal_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt-share/fetch": {
+      "post": {
+        "summary": "Fetch raw HTML for the browser UI",
+        "operationId": "fetchShareHtml",
+        "description": "Compatibility endpoint. Same public-share, origin, size, concurrency and rate limits as export. Rejects upstream redirects.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "shareId"
+                ],
+                "properties": {
+                  "shareId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upstream HTML; prefer /export for finished files.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request, invalid_url",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "invalid_request"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "origin_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "origin_not_allowed"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "method_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "method_not_allowed"
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "request_too_large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "request_too_large"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "unsupported_media_type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "unsupported_media_type"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "rate_limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "rate_limited"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retry.",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "internal_error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "upstream_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "upstream_unavailable"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "busy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "busy"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retry.",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "request_timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "request_timeout"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt-share/health": {
+      "get": {
+        "summary": "Service liveness",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "The API process is running. This does not check upstream ChatGPT access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "origin_not_allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "origin_not_allowed"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "enum": [
+              "busy",
+              "internal_error",
+              "invalid_request",
+              "invalid_url",
+              "method_not_allowed",
+              "not_found",
+              "origin_not_allowed",
+              "rate_limited",
+              "request_timeout",
+              "request_too_large",
+              "unreadable_conversation",
+              "unsupported_media_type",
+              "upstream_unavailable"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

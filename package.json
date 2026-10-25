@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run build:api",
+    "build:api": "vite build --config vite.server.config.ts",
+    "start:api": "node dist-ssr/index.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
