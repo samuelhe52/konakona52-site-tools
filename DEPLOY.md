@@ -45,6 +45,13 @@ analytics across the whole zone: other hosted applications still use injection.
 - `POST /api/webvpn/convert` accepts `direction: "encode"` or `"decode"` and a URL. It returns JSON and makes no upstream request.
 - `/llms.txt` and `/openapi.json` document the operations. Unknown API paths return JSON 404.
 
+Upstream requests honour `https_proxy`/`HTTPS_PROXY` (an `http://` proxy URL; `no_proxy`
+is respected). Through a proxy the proxy resolves the host, so the local DNS and
+address-pinning checks are skipped and only the hostname allowlist applies. Without
+a proxy variable, requests connect directly with pinned, validated addresses. The
+fetcher presents a browser user agent because ChatGPT returns a content-less
+link-preview page to non-browser clients.
+
 The API constructs the fixed `https://chatgpt.com/share/<UUID>` upstream itself.
 It rejects arbitrary share hosts, upstream redirects, oversized/non-HTML responses,
 invalid browser origins, and excess requests. CLI clients can omit `Origin`.

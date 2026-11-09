@@ -59,19 +59,19 @@ function attachmentFrom(value: unknown, messageIndex: number, fallbackIndex: num
     asString(value.name) ??
     asString(value.filename) ??
     asString(value.file_name) ??
+    asString(value.fileName) ??
     asString(value.display_name)
   if (!name) return undefined
 
+  const url = safeAttachmentUrl(value.download_url) ?? safeAttachmentUrl(value.downloadUrl) ?? safeAttachmentUrl(value.url)
   return {
-    id: asString(value.id) ?? asString(value.file_id) ?? `${messageIndex}-${fallbackIndex}-${name}`,
+    id: asString(value.id) ?? asString(value.file_id) ?? asString(value.key) ?? `${messageIndex}-${fallbackIndex}-${name}`,
     name,
-    mimeType: asString(value.mime_type) ?? asString(value.content_type),
-    url: safeAttachmentUrl(value.download_url) ?? safeAttachmentUrl(value.url),
+    mimeType: asString(value.mime_type) ?? asString(value.mimeType) ?? asString(value.content_type),
+    url,
     messageIndex,
     kind: 'uploaded',
-    availability: safeAttachmentUrl(value.download_url) ?? safeAttachmentUrl(value.url)
-      ? 'direct'
-      : 'public-share-unavailable',
+    availability: url ? 'direct' : 'public-share-unavailable',
   }
 }
 
@@ -96,15 +96,7 @@ function generatedArtifactsFor(text: string, messageIndex: number): ShareAttachm
   return artifacts
 }
 
-function attachmentsFor(message: UnknownRecord, messageIndex: number): ShareAttachment[] {
-  const content = isRecord(message.content) ? message.content : {}
-  const metadata = isRecord(message.metadata) ? message.metadata : {}
-  const containers = [
-    content.attachments,
-    content.files,
-    metadata.attachments,
-    metadata.files,
-  ]
+function collectAttachments(containers: unknown[], messageIndex: number): ShareAttachment[] {
   const attachments: ShareAttachment[] = []
 
   for (const container of containers) {
@@ -118,6 +110,17 @@ function attachmentsFor(message: UnknownRecord, messageIndex: number): ShareAtta
   }
 
   return attachments
+}
+
+function attachmentsFor(message: UnknownRecord, messageIndex: number): ShareAttachment[] {
+  const content = isRecord(message.content) ? message.content : {}
+  const metadata = isRecord(message.metadata) ? message.metadata : {}
+  return collectAttachments([
+    content.attachments,
+    content.files,
+    metadata.attachments,
+    metadata.files,
+  ], messageIndex)
 }
 
 function unpackPool(pool: unknown[]): UnknownRecord {
@@ -209,7 +212,96 @@ export function parseShareUrl(input: string): { shareId: string; sourceUrl: stri
   return { shareId: shareId.toLowerCase(), sourceUrl: `https://chatgpt.com/share/${shareId.toLowerCase()}` }
 }
 
+const CURRENT_DATA_SCRIPT_ID = '__WEB_MOBILE_DATA__'
+const CURRENT_TRANSCRIPT_SCRIPT_ID = 'octane-conversation-transcript'
+
+/** Return the text of `<script id="...">`, or undefined when the page has no such script. */
+function scriptText(html: string, id: string): string | undefined {
+  // Plain string scans instead of regexes, which can fail silently on multi-megabyte
+  // pages in Safari.
+  let idIndex = html.indexOf(`id="${id}"`)
+  if (idIndex === -1) idIndex = html.indexOf(`id='${id}'`)
+  if (idIndex === -1) return undefined
+
+  const tagStart = html.lastIndexOf('<script', idIndex)
+  const tagEnd = html.indexOf('>', idIndex)
+  if (tagStart === -1 || tagEnd === -1 || html.slice(tagStart, idIndex).includes('>')) return undefined
+  const end = html.indexOf('</script>', tagEnd)
+  return end === -1 ? undefined : html.slice(tagEnd + 1, end)
+}
+
+function currentTranscriptFrames(html: string): Map<string, UnknownRecord> {
+  const frames = new Map<string, UnknownRecord>()
+  // The transcript only supplies attachment slots; never fail the export over it.
+  try {
+    const text = scriptText(html, CURRENT_TRANSCRIPT_SCRIPT_ID)
+    const transcript: unknown = text ? JSON.parse(text) : undefined
+    if (!isRecord(transcript) || !Array.isArray(transcript.rows)) return frames
+    for (const row of transcript.rows) {
+      if (!isRecord(row) || !isRecord(row.frame)) continue
+      const id = asString(row.frame.id) ?? asString(row.key)
+      if (id) frames.set(id, row.frame)
+    }
+  } catch {
+    // Ignore a malformed or renamed transcript block.
+  }
+  return frames
+}
+
+/**
+ * ChatGPT's current share page embeds the conversation as plain JSON in
+ * `<script id="__WEB_MOBILE_DATA__">`: `conversation.title` plus
+ * `conversation.messages[]` of `{ id, role, content }` where `content` is Markdown.
+ * Tool calls and hidden reasoning are not part of this list.
+ */
+function parseCurrentConversation(html: string, sourceUrl: string): SharedConversation | undefined {
+  const text = scriptText(html, CURRENT_DATA_SCRIPT_ID)
+  if (text === undefined) return undefined
+
+  let data: unknown
+  try { data = JSON.parse(text) } catch { throw new Error('The shared page payload is not in the expected format.') }
+  const conversation = isRecord(data) && isRecord(data.conversation) ? data.conversation : undefined
+  if (!conversation || !Array.isArray(conversation.messages)) throw new Error('The shared page has no conversation data.')
+
+  const sharedContent = isRecord(conversation.sharedContent) ? conversation.sharedContent : {}
+  const title = asString(conversation.title) ?? asString(sharedContent.title) ?? 'ChatGPT export'
+  const frames = currentTranscriptFrames(html)
+
+  const messages: SharedMessage[] = []
+  conversation.messages.forEach((message, index) => {
+    if (!isRecord(message) || (message.role !== 'user' && message.role !== 'assistant') || typeof message.content !== 'string') return
+    const role = message.role
+    const text = cleanText(message.content)
+    const frame = frames.get(asString(message.id) ?? '')
+    let uploads = collectAttachments([message.attachments, message.files, frame?.attachments, frame?.fileAttachments], index)
+    // Public shares mask uploads: the page keeps only a count (`maskedUploads`) and a
+    // placeholder name, never the original filename.
+    if (uploads.length === 0 && Array.isArray(message.maskedUploads)) {
+      uploads = message.maskedUploads.map((_, upload): ShareAttachment => ({
+        id: `masked-${index}-${upload}`,
+        name: 'Uploaded a file',
+        messageIndex: index,
+        kind: 'uploaded',
+        availability: 'public-share-unavailable',
+      }))
+    }
+    const attachments = [
+      ...uploads,
+      ...(role === 'assistant' ? generatedArtifactsFor(text, index) : []),
+    ]
+    if (text || attachments.length > 0) messages.push({ role, text, attachments })
+  })
+
+  if (messages.length === 0) throw new Error('No visible user or assistant messages were found.')
+  return { title, sourceUrl, messages, attachments: messages.flatMap(message => message.attachments) }
+}
+
 export function parseSharedConversation(html: string, sourceUrl: string): SharedConversation {
+  return parseCurrentConversation(html, sourceUrl) ?? parseLegacyConversation(html, sourceUrl)
+}
+
+/** Older share pages (React Router stream payload), kept for previously saved HTML. */
+function parseLegacyConversation(html: string, sourceUrl: string): SharedConversation {
   const data = conversationData(decodePayload(html))
   const title = asString(data.title) ?? 'ChatGPT export'
   const nodes = data.linear_conversation
